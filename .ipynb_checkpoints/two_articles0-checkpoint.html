@@ -1,0 +1,444 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script>function neighbourhoodHighlight(params) {
+  // console.log("in nieghbourhoodhighlight");
+  allNodes = nodes.get({ returnType: "Object" });
+  // originalNodes = JSON.parse(JSON.stringify(allNodes));
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    highlightActive = true;
+    var i, j;
+    var selectedNode = params.nodes[0];
+    var degrees = 2;
+
+    // mark all nodes as hard to read.
+    for (let nodeId in allNodes) {
+      // nodeColors[nodeId] = allNodes[nodeId].color;
+      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
+      if (allNodes[nodeId].hiddenLabel === undefined) {
+        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+    var connectedNodes = network.getConnectedNodes(selectedNode);
+    var allConnectedNodes = [];
+
+    // get the second degree nodes
+    for (i = 1; i < degrees; i++) {
+      for (j = 0; j < connectedNodes.length; j++) {
+        allConnectedNodes = allConnectedNodes.concat(
+          network.getConnectedNodes(connectedNodes[j])
+        );
+      }
+    }
+
+    // all second degree nodes get a different color and their label back
+    for (i = 0; i < allConnectedNodes.length; i++) {
+      // allNodes[allConnectedNodes[i]].color = "pink";
+      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
+      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[allConnectedNodes[i]].label =
+          allNodes[allConnectedNodes[i]].hiddenLabel;
+        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // all first degree nodes get their own color and their label back
+    for (i = 0; i < connectedNodes.length; i++) {
+      // allNodes[connectedNodes[i]].color = undefined;
+      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
+      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[connectedNodes[i]].label =
+          allNodes[connectedNodes[i]].hiddenLabel;
+        allNodes[connectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // the main node gets its own color and its label back.
+    // allNodes[selectedNode].color = undefined;
+    allNodes[selectedNode].color = nodeColors[selectedNode];
+    if (allNodes[selectedNode].hiddenLabel !== undefined) {
+      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+      allNodes[selectedNode].hiddenLabel = undefined;
+    }
+  } else if (highlightActive === true) {
+    // console.log("highlightActive was true");
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      // allNodes[nodeId].color = "purple";
+      allNodes[nodeId].color = nodeColors[nodeId];
+      // delete allNodes[nodeId].color;
+      if (allNodes[nodeId].hiddenLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+        allNodes[nodeId].hiddenLabel = undefined;
+      }
+    }
+    highlightActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    // console.log("Nothing was selected");
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        // allNodes[nodeId].color = {};
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function filterHighlight(params) {
+  allNodes = nodes.get({ returnType: "Object" });
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    filterActive = true;
+    let selectedNodes = params.nodes;
+
+    // hiding all nodes and saving the label
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = true;
+      if (allNodes[nodeId].savedLabel === undefined) {
+        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+
+    for (let i=0; i < selectedNodes.length; i++) {
+      allNodes[selectedNodes[i]].hidden = false;
+      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
+        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
+        allNodes[selectedNodes[i]].savedLabel = undefined;
+      }
+    }
+
+  } else if (filterActive === true) {
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = false;
+      if (allNodes[nodeId].savedLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
+        allNodes[nodeId].savedLabel = undefined;
+      }
+    }
+    filterActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function selectNode(nodes) {
+  network.selectNodes(nodes);
+  neighbourhoodHighlight({ nodes: nodes });
+  return nodes;
+}
+
+function selectNodes(nodes) {
+  network.selectNodes(nodes);
+  filterHighlight({nodes: nodes});
+  return nodes;
+}
+
+function highlightFilter(filter) {
+  let selectedNodes = []
+  let selectedProp = filter['property']
+  if (filter['item'] === 'node') {
+    let allNodes = nodes.get({ returnType: "Object" });
+    for (let nodeId in allNodes) {
+      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
+        selectedNodes.push(nodeId)
+      }
+    }
+  }
+  else if (filter['item'] === 'edge'){
+    let allEdges = edges.get({returnType: 'object'});
+    // check if the selected property exists for selected edge and select the nodes connected to the edge
+    for (let edge in allEdges) {
+      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
+        selectedNodes.push(allEdges[edge]['from'])
+        selectedNodes.push(allEdges[edge]['to'])
+      }
+    }
+  }
+  selectNodes(selectedNodes)
+}</script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+            
+            
+            
+            
+            
+
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 600px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "m", "instance": null, "label": "m", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "multi-sentence", "instance": null, "label": "multi-sentence", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "a", "instance": null, "label": "a", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "l", "instance": null, "label": "l", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "b", "instance": null, "label": "b", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "r2", "instance": null, "label": "r2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "e4", "instance": null, "label": "e4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h7", "instance": null, "label": "h7", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "u", "instance": null, "label": "u", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "a7", "instance": null, "label": "a7", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h2", "instance": null, "label": "h2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s2", "instance": null, "label": "s2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h10", "instance": null, "label": "h10", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "e6", "instance": null, "label": "e6", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h12", "instance": null, "label": "h12", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "and", "instance": null, "label": "and", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "p", "instance": null, "label": "p", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "m2", "instance": null, "label": "m2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "philosophy", "instance": null, "label": "philosophy", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "p2", "instance": null, "label": "p2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "a2", "instance": null, "label": "a2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "politics", "instance": null, "label": "politics", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "anarchy", "instance": null, "label": "anarchy", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "movement-07", "instance": null, "label": "movement-07", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "o", "instance": null, "label": "o", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "oppose-01", "instance": null, "label": "oppose-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "c", "instance": null, "label": "c", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "capitalism", "instance": null, "label": "capitalism", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h", "instance": null, "label": "h", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "have-03", "instance": null, "label": "have-03", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "-", "instance": null, "label": "-", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s", "instance": null, "label": "s", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "system", "instance": null, "label": "system", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "f", "instance": null, "label": "f", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "formal", "instance": null, "label": "formal", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "live-01", "instance": null, "label": "live-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s3", "instance": null, "label": "s3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "human", "instance": null, "label": "human", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "society", "instance": null, "label": "society", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "before", "instance": null, "label": "before", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "e", "instance": null, "label": "e", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "establish-01", "instance": null, "label": "establish-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "o2", "instance": null, "label": "o2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "or", "instance": null, "label": "or", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s4", "instance": null, "label": "s4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "r", "instance": null, "label": "r", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "e2", "instance": null, "label": "e2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "a3", "instance": null, "label": "a3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "state", "instance": null, "label": "state", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "realm", "instance": null, "label": "realm", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "empire", "instance": null, "label": "empire", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "all", "instance": null, "label": "all", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "v", "instance": null, "label": "v", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "voluntary-02", "instance": null, "label": "voluntary-02", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h3", "instance": null, "label": "h3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "have-degree-91", "instance": null, "label": "have-degree-91", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "l2", "instance": null, "label": "l2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "m3", "instance": null, "label": "m3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "long-03", "instance": null, "label": "long-03", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "most", "instance": null, "label": "most", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "rise-01", "instance": null, "label": "rise-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "p3", "instance": null, "label": "p3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "a4", "instance": null, "label": "a4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "political-movement", "instance": null, "label": "political-movement", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "n", "instance": null, "label": "n", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "name", "instance": null, "label": "name", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "\"archism\"", "instance": null, "label": "\"archism\"", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "abolish-01", "instance": null, "label": "abolish-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "a5", "instance": null, "label": "a5", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "authority", "instance": null, "label": "authority", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "e3", "instance": null, "label": "e3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "end-01", "instance": null, "label": "end-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h4", "instance": null, "label": "h4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "hold-02", "instance": null, "label": "hold-02", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "emerge-01", "instance": null, "label": "emerge-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "p4", "instance": null, "label": "p4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "n2", "instance": null, "label": "n2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "m4", "instance": null, "label": "m4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "modern-02", "instance": null, "label": "modern-02", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h5", "instance": null, "label": "h5", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "have-concession-91", "instance": null, "label": "have-concession-91", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "a6", "instance": null, "label": "a6", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "n3", "instance": null, "label": "n3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "d", "instance": null, "label": "d", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h6", "instance": null, "label": "h6", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "need-01", "instance": null, "label": "need-01", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "desirable-02", "instance": null, "label": "desirable-02", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "harmful-02", "instance": null, "label": "harmful-02", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "p5", "instance": null, "label": "p5", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "w", "instance": null, "label": "w", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "n4", "instance": null, "label": "n4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "\"socialism\"", "instance": null, "label": "\"socialism\"", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "wing", "instance": null, "label": "wing", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "l3", "instance": null, "label": "l3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "libertarian", "instance": null, "label": "libertarian", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h8", "instance": null, "label": "h8", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "f2", "instance": null, "label": "f2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "m5", "instance": null, "label": "m5", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "far", "instance": null, "label": "far", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "usual", "instance": null, "label": "usual", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h9", "instance": null, "label": "h9", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "c2", "instance": null, "label": "c2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "half", "instance": null, "label": "half", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "d2", "instance": null, "label": "d2", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "d3", "instance": null, "label": "d3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "date-entity", "instance": null, "label": "date-entity", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "19", "instance": null, "label": "19", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "20", "instance": null, "label": "20", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "century", "instance": null, "label": "century", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "o3", "instance": null, "label": "o3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "ordinal-entity", "instance": null, "label": "ordinal-entity", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "1", "instance": null, "label": "1", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s5", "instance": null, "label": "s5", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "e5", "instance": null, "label": "e5", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "o4", "instance": null, "label": "o4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s6", "instance": null, "label": "s6", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s7", "instance": null, "label": "s7", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "h11", "instance": null, "label": "h11", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "l4", "instance": null, "label": "l4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s8", "instance": null, "label": "s8", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "m6", "instance": null, "label": "m6", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "s9", "instance": null, "label": "s9", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "significant-02", "instance": null, "label": "significant-02", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "history", "instance": null, "label": "history", "shape": "dot", "size": 10}]);
+                  edges = new vis.DataSet([{"from": "m", "label": ":instance", "to": "multi-sentence", "width": 1}, {"from": "m", "label": ":snt1", "to": "a", "width": 1}, {"from": "m", "label": ":snt6", "to": "l", "width": 1}, {"from": "m", "label": ":time", "to": "b", "width": 1}, {"from": "m", "label": ":snt3", "to": "r2", "width": 1}, {"from": "m", "label": ":snt4", "to": "e4", "width": 1}, {"from": "m", "label": ":snt5", "to": "h7", "width": 1}, {"from": "m", "label": ":mod", "to": "u", "width": 1}, {"from": "m", "label": ":time", "to": "a7", "width": 1}, {"from": "m", "label": ":ARG0", "to": "h2", "width": 1}, {"from": "m", "label": ":location", "to": "s2", "width": 1}, {"from": "m", "label": ":manner", "to": "h10", "width": 1}, {"from": "m", "label": ":op1", "to": "e6", "width": 1}, {"from": "m", "label": ":snt7", "to": "h12", "width": 1}, {"from": "a", "label": ":instance", "to": "and", "width": 1}, {"from": "a", "label": ":op1", "to": "p", "width": 1}, {"from": "a", "label": ":op2", "to": "m2", "width": 1}, {"from": "p", "label": ":instance", "to": "philosophy", "width": 1}, {"from": "p", "label": ":mod", "to": "p2", "width": 1}, {"from": "p", "label": ":domain", "to": "a2", "width": 1}, {"from": "p2", "label": ":instance", "to": "politics", "width": 1}, {"from": "a2", "label": ":instance", "to": "anarchy", "width": 1}, {"from": "m2", "label": ":instance", "to": "movement-07", "width": 1}, {"from": "m2", "label": ":ARG0", "to": "a2", "width": 1}, {"from": "o", "label": ":ARG0", "to": "a", "width": 1}, {"from": "o", "label": ":instance", "to": "oppose-01", "width": 1}, {"from": "o", "label": ":ARG1", "to": "c", "width": 1}, {"from": "c", "label": ":instance", "to": "capitalism", "width": 1}, {"from": "h", "label": ":ARG0", "to": "a", "width": 1}, {"from": "h", "label": ":instance", "to": "have-03", "width": 1}, {"from": "h", "label": ":polarity", "to": "-", "width": 1}, {"from": "h", "label": ":ARG1", "to": "s", "width": 1}, {"from": "s", "label": ":instance", "to": "system", "width": 1}, {"from": "s", "label": ":mod", "to": "f", "width": 1}, {"from": "f", "label": ":instance", "to": "formal", "width": 1}, {"from": "l", "label": ":instance", "to": "live-01", "width": 1}, {"from": "l", "label": ":ARG0", "to": "h2", "width": 1}, {"from": "l", "label": ":location", "to": "s2", "width": 1}, {"from": "l", "label": ":manner", "to": "s3", "width": 1}, {"from": "h2", "label": ":instance", "to": "human", "width": 1}, {"from": "s2", "label": ":instance", "to": "society", "width": 1}, {"from": "s3", "label": ":instance", "to": "system", "width": 1}, {"from": "s3", "label": ":polarity", "to": "-", "width": 1}, {"from": "s3", "label": ":mod", "to": "f", "width": 1}, {"from": "b", "label": ":instance", "to": "before", "width": 1}, {"from": "b", "label": ":op1", "to": "e", "width": 1}, {"from": "e", "label": ":instance", "to": "establish-01", "width": 1}, {"from": "e", "label": ":ARG1", "to": "o2", "width": 1}, {"from": "o2", "label": ":instance", "to": "or", "width": 1}, {"from": "o2", "label": ":op1", "to": "s4", "width": 1}, {"from": "o2", "label": ":op2", "to": "r", "width": 1}, {"from": "o2", "label": ":op3", "to": "e2", "width": 1}, {"from": "o2", "label": ":mod", "to": "a3", "width": 1}, {"from": "s4", "label": ":instance", "to": "state", "width": 1}, {"from": "r", "label": ":instance", "to": "realm", "width": 1}, {"from": "e2", "label": ":instance", "to": "empire", "width": 1}, {"from": "a3", "label": ":instance", "to": "all", "width": 1}, {"from": "v", "label": ":ARG1", "to": "o2", "width": 1}, {"from": "v", "label": ":instance", "to": "voluntary-02", "width": 1}, {"from": "v", "label": ":polarity", "to": "-", "width": 1}, {"from": "h3", "label": ":ARG1", "to": "e", "width": 1}, {"from": "h3", "label": ":instance", "to": "have-degree-91", "width": 1}, {"from": "h3", "label": ":ARG2", "to": "l2", "width": 1}, {"from": "h3", "label": ":ARG3", "to": "m3", "width": 1}, {"from": "l2", "label": ":instance", "to": "long-03", "width": 1}, {"from": "m3", "label": ":instance", "to": "most", "width": 1}, {"from": "r2", "label": ":instance", "to": "rise-01", "width": 1}, {"from": "r2", "label": ":ARG0", "to": "p3", "width": 1}, {"from": "r2", "label": ":ARG1", "to": "a4", "width": 1}, {"from": "p3", "label": ":instance", "to": "political-movement", "width": 1}, {"from": "p3", "label": ":name", "to": "n", "width": 1}, {"from": "n", "label": ":instance", "to": "name", "width": 1}, {"from": "n", "label": ":op1", "to": "\"archism\"", "width": 1}, {"from": "a4", "label": ":instance", "to": "abolish-01", "width": 1}, {"from": "a4", "label": ":ARG1", "to": "a5", "width": 1}, {"from": "a5", "label": ":instance", "to": "authority", "width": 1}, {"from": "e3", "label": ":ARG1", "to": "r2", "width": 1}, {"from": "e3", "label": ":instance", "to": "end-01", "width": 1}, {"from": "h4", "label": ":ARG1", "to": "e3", "width": 1}, {"from": "h4", "label": ":instance", "to": "hold-02", "width": 1}, {"from": "h4", "label": ":ARG0", "to": "p3", "width": 1}, {"from": "e4", "label": ":instance", "to": "emerge-01", "width": 1}, {"from": "e4", "label": ":ARG0", "to": "p4", "width": 1}, {"from": "p4", "label": ":instance", "to": "political-movement", "width": 1}, {"from": "p4", "label": ":name", "to": "n2", "width": 1}, {"from": "n2", "label": ":instance", "to": "name", "width": 1}, {"from": "n2", "label": ":op1", "to": "\"archism\"", "width": 1}, {"from": "m4", "label": ":ARG1", "to": "p4", "width": 1}, {"from": "m4", "label": ":instance", "to": "modern-02", "width": 1}, {"from": "h5", "label": ":ARG1", "to": "e4", "width": 1}, {"from": "h5", "label": ":instance", "to": "have-concession-91", "width": 1}, {"from": "h5", "label": ":ARG2", "to": "a6", "width": 1}, {"from": "a6", "label": ":instance", "to": "and", "width": 1}, {"from": "a6", "label": ":op1", "to": "n3", "width": 1}, {"from": "a6", "label": ":op2", "to": "d", "width": 1}, {"from": "a6", "label": ":op3", "to": "h6", "width": 1}, {"from": "n3", "label": ":instance", "to": "need-01", "width": 1}, {"from": "n3", "label": ":polarity", "to": "-", "width": 1}, {"from": "n3", "label": ":ARG0", "to": "p4", "width": 1}, {"from": "d", "label": ":instance", "to": "desirable-02", "width": 1}, {"from": "d", "label": ":polarity", "to": "-", "width": 1}, {"from": "d", "label": ":ARG1", "to": "p4", "width": 1}, {"from": "h6", "label": ":instance", "to": "harmful-02", "width": 1}, {"from": "h6", "label": ":ARG0", "to": "p4", "width": 1}, {"from": "h7", "label": ":instance", "to": "have-03", "width": 1}, {"from": "h7", "label": ":ARG0", "to": "p5", "width": 1}, {"from": "h7", "label": ":ARG1", "to": "w", "width": 1}, {"from": "p5", "label": ":instance", "to": "political-movement", "width": 1}, {"from": "p5", "label": ":name", "to": "n4", "width": 1}, {"from": "n4", "label": ":instance", "to": "name", "width": 1}, {"from": "n4", "label": ":op1", "to": "\"socialism\"", "width": 1}, {"from": "w", "label": ":instance", "to": "wing", "width": 1}, {"from": "w", "label": ":mod", "to": "l3", "width": 1}, {"from": "l3", "label": ":instance", "to": "libertarian", "width": 1}, {"from": "h8", "label": ":ARG1", "to": "w", "width": 1}, {"from": "h8", "label": ":instance", "to": "have-degree-91", "width": 1}, {"from": "h8", "label": ":ARG2", "to": "f2", "width": 1}, {"from": "h8", "label": ":ARG3", "to": "m5", "width": 1}, {"from": "f2", "label": ":instance", "to": "far", "width": 1}, {"from": "m5", "label": ":instance", "to": "most", "width": 1}, {"from": "u", "label": ":instance", "to": "usual", "width": 1}, {"from": "a7", "label": ":instance", "to": "and", "width": 1}, {"from": "a7", "label": ":op1", "to": "h9", "width": 1}, {"from": "a7", "label": ":op3", "to": "c2", "width": 1}, {"from": "h9", "label": ":instance", "to": "half", "width": 1}, {"from": "h9", "label": ":op1", "to": "d2", "width": 1}, {"from": "h9", "label": ":op2", "to": "d3", "width": 1}, {"from": "d2", "label": ":instance", "to": "date-entity", "width": 1}, {"from": "d2", "label": ":century", "to": "19", "width": 1}, {"from": "d3", "label": ":instance", "to": "date-entity", "width": 1}, {"from": "d3", "label": ":century", "to": "20", "width": 1}, {"from": "c2", "label": ":instance", "to": "century", "width": 1}, {"from": "c2", "label": ":ord", "to": "o3", "width": 1}, {"from": "o3", "label": ":instance", "to": "ordinal-entity", "width": 1}, {"from": "o3", "label": ":value", "to": "1", "width": 1}, {"from": "h10", "label": ":instance", "to": "have-03", "width": 1}, {"from": "h10", "label": ":ARG0", "to": "s5", "width": 1}, {"from": "h10", "label": ":op3", "to": "e2", "width": 1}, {"from": "s5", "label": ":instance", "to": "system", "width": 1}, {"from": "s5", "label": ":polarity", "to": "-", "width": 1}, {"from": "s5", "label": ":mod", "to": "f", "width": 1}, {"from": "e5", "label": ":ARG1", "to": "h10", "width": 1}, {"from": "e5", "label": ":instance", "to": "establish-01", "width": 1}, {"from": "e5", "label": ":ARG1", "to": "o4", "width": 1}, {"from": "e5", "label": ":op2", "to": "r", "width": 1}, {"from": "o4", "label": ":instance", "to": "or", "width": 1}, {"from": "o4", "label": ":op1", "to": "s6", "width": 1}, {"from": "s6", "label": ":instance", "to": "state", "width": 1}, {"from": "s6", "label": ":mod", "to": "f", "width": 1}, {"from": "e6", "label": ":instance", "to": "establish-01", "width": 1}, {"from": "e6", "label": ":ARG1", "to": "s7", "width": 1}, {"from": "s7", "label": ":instance", "to": "system", "width": 1}, {"from": "s7", "label": ":mod", "to": "f", "width": 1}, {"from": "h11", "label": ":ARG1", "to": "m", "width": 1}, {"from": "h11", "label": ":instance", "to": "have-degree-91", "width": 1}, {"from": "h11", "label": ":ARG2", "to": "l4", "width": 1}, {"from": "l4", "label": ":instance", "to": "long-03", "width": 1}, {"from": "l4", "label": ":ARG1", "to": "s8", "width": 1}, {"from": "l4", "label": ":ARG3", "to": "m6", "width": 1}, {"from": "s8", "label": ":instance", "to": "state", "width": 1}, {"from": "m6", "label": ":instance", "to": "most", "width": 1}, {"from": "s9", "label": ":ARG1", "to": "m", "width": 1}, {"from": "s9", "label": ":instance", "to": "significant-02", "width": 1}, {"from": "h12", "label": ":instance", "to": "history", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

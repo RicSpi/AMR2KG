@@ -1,0 +1,452 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script>function neighbourhoodHighlight(params) {
+  // console.log("in nieghbourhoodhighlight");
+  allNodes = nodes.get({ returnType: "Object" });
+  // originalNodes = JSON.parse(JSON.stringify(allNodes));
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    highlightActive = true;
+    var i, j;
+    var selectedNode = params.nodes[0];
+    var degrees = 2;
+
+    // mark all nodes as hard to read.
+    for (let nodeId in allNodes) {
+      // nodeColors[nodeId] = allNodes[nodeId].color;
+      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
+      if (allNodes[nodeId].hiddenLabel === undefined) {
+        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+    var connectedNodes = network.getConnectedNodes(selectedNode);
+    var allConnectedNodes = [];
+
+    // get the second degree nodes
+    for (i = 1; i < degrees; i++) {
+      for (j = 0; j < connectedNodes.length; j++) {
+        allConnectedNodes = allConnectedNodes.concat(
+          network.getConnectedNodes(connectedNodes[j])
+        );
+      }
+    }
+
+    // all second degree nodes get a different color and their label back
+    for (i = 0; i < allConnectedNodes.length; i++) {
+      // allNodes[allConnectedNodes[i]].color = "pink";
+      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
+      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[allConnectedNodes[i]].label =
+          allNodes[allConnectedNodes[i]].hiddenLabel;
+        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // all first degree nodes get their own color and their label back
+    for (i = 0; i < connectedNodes.length; i++) {
+      // allNodes[connectedNodes[i]].color = undefined;
+      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
+      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[connectedNodes[i]].label =
+          allNodes[connectedNodes[i]].hiddenLabel;
+        allNodes[connectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // the main node gets its own color and its label back.
+    // allNodes[selectedNode].color = undefined;
+    allNodes[selectedNode].color = nodeColors[selectedNode];
+    if (allNodes[selectedNode].hiddenLabel !== undefined) {
+      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+      allNodes[selectedNode].hiddenLabel = undefined;
+    }
+  } else if (highlightActive === true) {
+    // console.log("highlightActive was true");
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      // allNodes[nodeId].color = "purple";
+      allNodes[nodeId].color = nodeColors[nodeId];
+      // delete allNodes[nodeId].color;
+      if (allNodes[nodeId].hiddenLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+        allNodes[nodeId].hiddenLabel = undefined;
+      }
+    }
+    highlightActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    // console.log("Nothing was selected");
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        // allNodes[nodeId].color = {};
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function filterHighlight(params) {
+  allNodes = nodes.get({ returnType: "Object" });
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    filterActive = true;
+    let selectedNodes = params.nodes;
+
+    // hiding all nodes and saving the label
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = true;
+      if (allNodes[nodeId].savedLabel === undefined) {
+        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+
+    for (let i=0; i < selectedNodes.length; i++) {
+      allNodes[selectedNodes[i]].hidden = false;
+      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
+        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
+        allNodes[selectedNodes[i]].savedLabel = undefined;
+      }
+    }
+
+  } else if (filterActive === true) {
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = false;
+      if (allNodes[nodeId].savedLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
+        allNodes[nodeId].savedLabel = undefined;
+      }
+    }
+    filterActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function selectNode(nodes) {
+  network.selectNodes(nodes);
+  neighbourhoodHighlight({ nodes: nodes });
+  return nodes;
+}
+
+function selectNodes(nodes) {
+  network.selectNodes(nodes);
+  filterHighlight({nodes: nodes});
+  return nodes;
+}
+
+function highlightFilter(filter) {
+  let selectedNodes = []
+  let selectedProp = filter['property']
+  if (filter['item'] === 'node') {
+    let allNodes = nodes.get({ returnType: "Object" });
+    for (let nodeId in allNodes) {
+      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
+        selectedNodes.push(nodeId)
+      }
+    }
+  }
+  else if (filter['item'] === 'edge'){
+    let allEdges = edges.get({returnType: 'object'});
+    // check if the selected property exists for selected edge and select the nodes connected to the edge
+    for (let edge in allEdges) {
+      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
+        selectedNodes.push(allEdges[edge]['from'])
+        selectedNodes.push(allEdges[edge]['to'])
+      }
+    }
+  }
+  selectNodes(selectedNodes)
+}</script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+            
+            
+            
+            
+            
+
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 600px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "http://example.org/a2", "label": "http://example.org/a2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/after", "label": "http://example.org/after", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/c2", "label": "http://example.org/c2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/country", "label": "http://example.org/country", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/n5", "label": "http://example.org/n5", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/name", "label": "http://example.org/name", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/l2", "label": "http://example.org/l2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/light-04", "label": "http://example.org/light-04", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/w", "label": "http://example.org/w", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/p", "label": "http://example.org/p", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/p2", "label": "http://example.org/p2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/penal", "label": "http://example.org/penal", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/r", "label": "http://example.org/r", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/a", "label": "http://example.org/a", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/m2", "label": "http://example.org/m2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/h", "label": "http://example.org/h", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/c4", "label": "http://example.org/c4", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/receive-01", "label": "http://example.org/receive-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/u", "label": "http://example.org/u", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/undergo-28", "label": "http://example.org/undergo-28", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/e", "label": "http://example.org/e", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/t", "label": "http://example.org/t", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/g", "label": "http://example.org/g", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/c3", "label": "http://example.org/c3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/company", "label": "http://example.org/company", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/n", "label": "http://example.org/n", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Nameless", "label": "http://example.org/Nameless", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/n3", "label": "http://example.org/n3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/make-02", "label": "http://example.org/make-02", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/person", "label": "http://example.org/person", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/p4", "label": "http://example.org/p4", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/f", "label": "http://example.org/f", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/n2", "label": "http://example.org/n2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Azure", "label": "http://example.org/Azure", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/p3", "label": "http://example.org/p3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/o3", "label": "http://example.org/o3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/ii", "label": "http://example.org/ii", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/y", "label": "http://example.org/y", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/game", "label": "http://example.org/game", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/II", "label": "http://example.org/II", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/o2", "label": "http://example.org/o2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/new-01", "label": "http://example.org/new-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/r2", "label": "http://example.org/r2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/c", "label": "http://example.org/c", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/e2", "label": "http://example.org/e2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/expand-01", "label": "http://example.org/expand-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/b", "label": "http://example.org/b", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/book", "label": "http://example.org/book", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/adapt-01", "label": "http://example.org/adapt-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/l", "label": "http://example.org/l", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/language", "label": "http://example.org/language", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/p5", "label": "http://example.org/p5", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/portion", "label": "http://example.org/portion", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/localized-02", "label": "http://example.org/localized-02", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/compatible", "label": "http://example.org/compatible", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/g2", "label": "http://example.org/g2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/n6", "label": "http://example.org/n6", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/May\u0027n", "label": "http://example.org/May\u0027n", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/3", "label": "http://example.org/3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/a4", "label": "http://example.org/a4", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/n4", "label": "http://example.org/n4", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/perform-02", "label": "http://example.org/perform-02", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/previous", "label": "http://example.org/previous", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/2", "label": "http://example.org/2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/m", "label": "http://example.org/m", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/u2", "label": "http://example.org/u2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Japanese", "label": "http://example.org/Japanese", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/have-degree-91", "label": "http://example.org/have-degree-91", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/retain-01", "label": "http://example.org/retain-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/d", "label": "http://example.org/d", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/2010", "label": "http://example.org/2010", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/that", "label": "http://example.org/that", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/operation", "label": "http://example.org/operation", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Japan", "label": "http://example.org/Japan", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Chronicles", "label": "http://example.org/Chronicles", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Raita", "label": "http://example.org/Raita", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/b2", "label": "http://example.org/b2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/s", "label": "http://example.org/s", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/series", "label": "http://example.org/series", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Gallia", "label": "http://example.org/Gallia", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/positive", "label": "http://example.org/positive", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/w2", "label": "http://example.org/w2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Takeshi", "label": "http://example.org/Takeshi", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/f2", "label": "http://example.org/f2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/feature", "label": "http://example.org/feature", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Media.Vision", "label": "http://example.org/Media.Vision", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Portable", "label": "http://example.org/Portable", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/release-01", "label": "http://example.org/release-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/cause-01", "label": "http://example.org/cause-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/War", "label": "http://example.org/War", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Calamaty", "label": "http://example.org/Calamaty", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/o", "label": "http://example.org/o", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/also", "label": "http://example.org/also", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/follow-01", "label": "http://example.org/follow-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/d2", "label": "http://example.org/d2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/date-entity", "label": "http://example.org/date-entity", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/director", "label": "http://example.org/director", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/it", "label": "http://example.org/it", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/download-01", "label": "http://example.org/download-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/handle-01", "label": "http://example.org/handle-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Raven", "label": "http://example.org/Raven", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Battlefield", "label": "http://example.org/Battlefield", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/develop-02", "label": "http://example.org/develop-02", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Valkyria", "label": "http://example.org/Valkyria", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Ozawa", "label": "http://example.org/Ozawa", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Sega", "label": "http://example.org/Sega", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/title-01", "label": "http://example.org/title-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/-", "label": "http://example.org/-", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/common", "label": "http://example.org/common", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/work-01", "label": "http://example.org/work-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/outside", "label": "http://example.org/outside", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/v", "label": "http://example.org/v", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/video", "label": "http://example.org/video", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/adjust-01", "label": "http://example.org/adjust-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/compose-01", "label": "http://example.org/compose-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/the", "label": "http://example.org/the", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/s2", "label": "http://example.org/s2", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/g3", "label": "http://example.org/g3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/tactic", "label": "http://example.org/tactic", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/carry-over-02", "label": "http://example.org/carry-over-02", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/m3", "label": "http://example.org/m3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/ordinal-entity", "label": "http://example.org/ordinal-entity", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Senj\u014d", "label": "http://example.org/Senj\u014d", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/black-07", "label": "http://example.org/black-07", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/fan", "label": "http://example.org/fan", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/script", "label": "http://example.org/script", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/have-org-role-91", "label": "http://example.org/have-org-role-91", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/1", "label": "http://example.org/1", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/sell-01", "label": "http://example.org/sell-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/11", "label": "http://example.org/11", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/more", "label": "http://example.org/more", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/2014", "label": "http://example.org/2014", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/war", "label": "http://example.org/war", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Hitoshi", "label": "http://example.org/Hitoshi", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/s3", "label": "http://example.org/s3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Revolution", "label": "http://example.org/Revolution", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/secret", "label": "http://example.org/secret", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Sakimoto", "label": "http://example.org/Sakimoto", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/open-01", "label": "http://example.org/open-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/low-04", "label": "http://example.org/low-04", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/nation", "label": "http://example.org/nation", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/a3", "label": "http://example.org/a3", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/animation", "label": "http://example.org/animation", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/empire", "label": "http://example.org/empire", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/sing-01", "label": "http://example.org/sing-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/story", "label": "http://example.org/story", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/2011", "label": "http://example.org/2011", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/return-01", "label": "http://example.org/return-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/no", "label": "http://example.org/no", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/forgive-01", "label": "http://example.org/forgive-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/multiple", "label": "http://example.org/multiple", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/of", "label": "http://example.org/of", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Unrecorded", "label": "http://example.org/Unrecorded", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/entry", "label": "http://example.org/entry", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/character", "label": "http://example.org/character", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Europan", "label": "http://example.org/Europan", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/design-01", "label": "http://example.org/design-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/PlayStation", "label": "http://example.org/PlayStation", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/pit-01", "label": "http://example.org/pit-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/both", "label": "http://example.org/both", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/refer-01", "label": "http://example.org/refer-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/world-region", "label": "http://example.org/world-region", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/large", "label": "http://example.org/large", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/year", "label": "http://example.org/year", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/West", "label": "http://example.org/West", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/PS4", "label": "http://example.org/PS4", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/role", "label": "http://example.org/role", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/serve-01", "label": "http://example.org/serve-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/military", "label": "http://example.org/military", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/and", "label": "http://example.org/and", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/content", "label": "http://example.org/content", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/theme", "label": "http://example.org/theme", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/original", "label": "http://example.org/original", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/Honjou", "label": "http://example.org/Honjou", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/multi-sentence", "label": "http://example.org/multi-sentence", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/manga", "label": "http://example.org/manga", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/parallel-01", "label": "http://example.org/parallel-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/meet-01", "label": "http://example.org/meet-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/praise-01", "label": "http://example.org/praise-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/write-01", "label": "http://example.org/write-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/III", "label": "http://example.org/III", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/translate-01", "label": "http://example.org/translate-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/standard-02", "label": "http://example.org/standard-02", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/criticize-01", "label": "http://example.org/criticize-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/unit", "label": "http://example.org/unit", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/franchise", "label": "http://example.org/franchise", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/team", "label": "http://example.org/team", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/contrast-01", "label": "http://example.org/contrast-01", "shape": "dot"}, {"color": "#97c2fc", "id": "http://example.org/edition", "label": "http://example.org/edition", "shape": "dot"}]);
+                  edges = new vis.DataSet([{"from": "http://example.org/a2", "to": "http://example.org/after"}, {"from": "http://example.org/a2", "to": "http://example.org/m"}, {"from": "http://example.org/a2", "to": "http://example.org/also"}, {"from": "http://example.org/a2", "to": "http://example.org/s"}, {"from": "http://example.org/a2", "to": "http://example.org/p4"}, {"from": "http://example.org/a2", "to": "http://example.org/p5"}, {"from": "http://example.org/a2", "to": "http://example.org/and"}, {"from": "http://example.org/a2", "to": "http://example.org/r2"}, {"from": "http://example.org/c2", "to": "http://example.org/country"}, {"from": "http://example.org/c2", "to": "http://example.org/n3"}, {"from": "http://example.org/c2", "to": "http://example.org/w2"}, {"from": "http://example.org/c2", "to": "http://example.org/p4"}, {"from": "http://example.org/c2", "to": "http://example.org/cause-01"}, {"from": "http://example.org/c2", "to": "http://example.org/s"}, {"from": "http://example.org/c2", "to": "http://example.org/compose-01"}, {"from": "http://example.org/c2", "to": "http://example.org/carry-over-02"}, {"from": "http://example.org/c2", "to": "http://example.org/p2"}, {"from": "http://example.org/c2", "to": "http://example.org/l2"}, {"from": "http://example.org/c2", "to": "http://example.org/criticize-01"}, {"from": "http://example.org/n5", "to": "http://example.org/name"}, {"from": "http://example.org/n5", "to": "http://example.org/Calamaty"}, {"from": "http://example.org/n5", "to": "http://example.org/Raven"}, {"from": "http://example.org/n5", "to": "http://example.org/Media.Vision"}, {"from": "http://example.org/l2", "to": "http://example.org/light-04"}, {"from": "http://example.org/l2", "to": "http://example.org/g"}, {"from": "http://example.org/l2", "to": "http://example.org/localized-02"}, {"from": "http://example.org/l2", "to": "http://example.org/-"}, {"from": "http://example.org/l2", "to": "http://example.org/b2"}, {"from": "http://example.org/w", "to": "http://example.org/p"}, {"from": "http://example.org/w", "to": "http://example.org/o2"}, {"from": "http://example.org/w", "to": "http://example.org/n4"}, {"from": "http://example.org/w", "to": "http://example.org/n3"}, {"from": "http://example.org/w", "to": "http://example.org/war"}, {"from": "http://example.org/w", "to": "http://example.org/world-region"}, {"from": "http://example.org/w", "to": "http://example.org/write-01"}, {"from": "http://example.org/p", "to": "http://example.org/person"}, {"from": "http://example.org/p", "to": "http://example.org/n"}, {"from": "http://example.org/p", "to": "http://example.org/g"}, {"from": "http://example.org/p", "to": "http://example.org/t"}, {"from": "http://example.org/p", "to": "http://example.org/parallel-01"}, {"from": "http://example.org/p", "to": "http://example.org/s"}, {"from": "http://example.org/p2", "to": "http://example.org/penal"}, {"from": "http://example.org/p2", "to": "http://example.org/person"}, {"from": "http://example.org/p2", "to": "http://example.org/positive"}, {"from": "http://example.org/p2", "to": "http://example.org/n2"}, {"from": "http://example.org/r", "to": "http://example.org/a"}, {"from": "http://example.org/r", "to": "http://example.org/receive-01"}, {"from": "http://example.org/r", "to": "http://example.org/e"}, {"from": "http://example.org/r", "to": "http://example.org/t"}, {"from": "http://example.org/r", "to": "http://example.org/f"}, {"from": "http://example.org/r", "to": "http://example.org/retain-01"}, {"from": "http://example.org/r", "to": "http://example.org/d"}, {"from": "http://example.org/r", "to": "http://example.org/ii"}, {"from": "http://example.org/r", "to": "http://example.org/release-01"}, {"from": "http://example.org/r", "to": "http://example.org/c"}, {"from": "http://example.org/r", "to": "http://example.org/d2"}, {"from": "http://example.org/r", "to": "http://example.org/f2"}, {"from": "http://example.org/r", "to": "http://example.org/g"}, {"from": "http://example.org/r", "to": "http://example.org/return-01"}, {"from": "http://example.org/r", "to": "http://example.org/role"}, {"from": "http://example.org/r", "to": "http://example.org/a2"}, {"from": "http://example.org/r", "to": "http://example.org/p4"}, {"from": "http://example.org/a", "to": "http://example.org/m2"}, {"from": "http://example.org/a", "to": "http://example.org/a2"}, {"from": "http://example.org/a", "to": "http://example.org/adapt-01"}, {"from": "http://example.org/a", "to": "http://example.org/a4"}, {"from": "http://example.org/a", "to": "http://example.org/f"}, {"from": "http://example.org/a", "to": "http://example.org/adjust-01"}, {"from": "http://example.org/a", "to": "http://example.org/d"}, {"from": "http://example.org/a", "to": "http://example.org/p3"}, {"from": "http://example.org/a", "to": "http://example.org/b"}, {"from": "http://example.org/a", "to": "http://example.org/m"}, {"from": "http://example.org/a", "to": "http://example.org/c"}, {"from": "http://example.org/a", "to": "http://example.org/c4"}, {"from": "http://example.org/a", "to": "http://example.org/c3"}, {"from": "http://example.org/a", "to": "http://example.org/ii"}, {"from": "http://example.org/a", "to": "http://example.org/p2"}, {"from": "http://example.org/a", "to": "http://example.org/p"}, {"from": "http://example.org/a", "to": "http://example.org/and"}, {"from": "http://example.org/a", "to": "http://example.org/e"}, {"from": "http://example.org/m2", "to": "http://example.org/h"}, {"from": "http://example.org/m2", "to": "http://example.org/make-02"}, {"from": "http://example.org/m2", "to": "http://example.org/ii"}, {"from": "http://example.org/m2", "to": "http://example.org/meet-01"}, {"from": "http://example.org/m2", "to": "http://example.org/s2"}, {"from": "http://example.org/h", "to": "http://example.org/p4"}, {"from": "http://example.org/h", "to": "http://example.org/have-degree-91"}, {"from": "http://example.org/h", "to": "http://example.org/b2"}, {"from": "http://example.org/h", "to": "http://example.org/g"}, {"from": "http://example.org/h", "to": "http://example.org/t"}, {"from": "http://example.org/h", "to": "http://example.org/handle-01"}, {"from": "http://example.org/h", "to": "http://example.org/f"}, {"from": "http://example.org/h", "to": "http://example.org/m3"}, {"from": "http://example.org/h", "to": "http://example.org/have-org-role-91"}, {"from": "http://example.org/h", "to": "http://example.org/d2"}, {"from": "http://example.org/h", "to": "http://example.org/s"}, {"from": "http://example.org/c4", "to": "http://example.org/n5"}, {"from": "http://example.org/c4", "to": "http://example.org/company"}, {"from": "http://example.org/u", "to": "http://example.org/undergo-28"}, {"from": "http://example.org/u", "to": "http://example.org/m"}, {"from": "http://example.org/u", "to": "http://example.org/n"}, {"from": "http://example.org/u", "to": "http://example.org/p2"}, {"from": "http://example.org/u", "to": "http://example.org/r"}, {"from": "http://example.org/u", "to": "http://example.org/a"}, {"from": "http://example.org/u", "to": "http://example.org/ii"}, {"from": "http://example.org/u", "to": "http://example.org/a2"}, {"from": "http://example.org/u", "to": "http://example.org/unit"}, {"from": "http://example.org/e", "to": "http://example.org/empire"}, {"from": "http://example.org/e", "to": "http://example.org/entry"}, {"from": "http://example.org/e", "to": "http://example.org/p3"}, {"from": "http://example.org/e", "to": "http://example.org/g2"}, {"from": "http://example.org/e", "to": "http://example.org/edition"}, {"from": "http://example.org/t", "to": "http://example.org/f"}, {"from": "http://example.org/t", "to": "http://example.org/that"}, {"from": "http://example.org/t", "to": "http://example.org/title-01"}, {"from": "http://example.org/t", "to": "http://example.org/tactic"}, {"from": "http://example.org/t", "to": "http://example.org/l"}, {"from": "http://example.org/t", "to": "http://example.org/b"}, {"from": "http://example.org/t", "to": "http://example.org/b2"}, {"from": "http://example.org/t", "to": "http://example.org/theme"}, {"from": "http://example.org/t", "to": "http://example.org/translate-01"}, {"from": "http://example.org/t", "to": "http://example.org/team"}, {"from": "http://example.org/g", "to": "http://example.org/ii"}, {"from": "http://example.org/g", "to": "http://example.org/game"}, {"from": "http://example.org/g", "to": "http://example.org/n2"}, {"from": "http://example.org/g", "to": "http://example.org/n"}, {"from": "http://example.org/g", "to": "http://example.org/o"}, {"from": "http://example.org/g", "to": "http://example.org/g2"}, {"from": "http://example.org/c3", "to": "http://example.org/company"}, {"from": "http://example.org/c3", "to": "http://example.org/compatible"}, {"from": "http://example.org/c3", "to": "http://example.org/t"}, {"from": "http://example.org/c3", "to": "http://example.org/n4"}, {"from": "http://example.org/c3", "to": "http://example.org/e"}, {"from": "http://example.org/n", "to": "http://example.org/Nameless"}, {"from": "http://example.org/n", "to": "http://example.org/II"}, {"from": "http://example.org/n", "to": "http://example.org/new-01"}, {"from": "http://example.org/n", "to": "http://example.org/May\u0027n"}, {"from": "http://example.org/n", "to": "http://example.org/3"}, {"from": "http://example.org/n", "to": "http://example.org/Chronicles"}, {"from": "http://example.org/n", "to": "http://example.org/Raita"}, {"from": "http://example.org/n", "to": "http://example.org/Media.Vision"}, {"from": "http://example.org/n", "to": "http://example.org/Battlefield"}, {"from": "http://example.org/n", "to": "http://example.org/the"}, {"from": "http://example.org/n", "to": "http://example.org/name"}, {"from": "http://example.org/n", "to": "http://example.org/Senj\u014d"}, {"from": "http://example.org/n", "to": "http://example.org/Valkyria"}, {"from": "http://example.org/n", "to": "http://example.org/no"}, {"from": "http://example.org/n", "to": "http://example.org/of"}, {"from": "http://example.org/n", "to": "http://example.org/Honjou"}, {"from": "http://example.org/n", "to": "http://example.org/series"}, {"from": "http://example.org/n3", "to": "http://example.org/Japanese"}, {"from": "http://example.org/n3", "to": "http://example.org/Japan"}, {"from": "http://example.org/n3", "to": "http://example.org/Gallia"}, {"from": "http://example.org/n3", "to": "http://example.org/Takeshi"}, {"from": "http://example.org/n3", "to": "http://example.org/name"}, {"from": "http://example.org/n3", "to": "http://example.org/Ozawa"}, {"from": "http://example.org/n3", "to": "http://example.org/West"}, {"from": "http://example.org/n3", "to": "http://example.org/PS4"}, {"from": "http://example.org/p4", "to": "http://example.org/person"}, {"from": "http://example.org/p4", "to": "http://example.org/u2"}, {"from": "http://example.org/p4", "to": "http://example.org/n3"}, {"from": "http://example.org/p4", "to": "http://example.org/u"}, {"from": "http://example.org/p4", "to": "http://example.org/c"}, {"from": "http://example.org/p4", "to": "http://example.org/pit-01"}, {"from": "http://example.org/f", "to": "http://example.org/follow-01"}, {"from": "http://example.org/f", "to": "http://example.org/p"}, {"from": "http://example.org/f", "to": "http://example.org/g"}, {"from": "http://example.org/f", "to": "http://example.org/u"}, {"from": "http://example.org/f", "to": "http://example.org/fan"}, {"from": "http://example.org/f", "to": "http://example.org/forgive-01"}, {"from": "http://example.org/f", "to": "http://example.org/s"}, {"from": "http://example.org/f", "to": "http://example.org/franchise"}, {"from": "http://example.org/n2", "to": "http://example.org/Azure"}, {"from": "http://example.org/n2", "to": "http://example.org/n3"}, {"from": "http://example.org/n2", "to": "http://example.org/Valkyria"}, {"from": "http://example.org/n2", "to": "http://example.org/Japan"}, {"from": "http://example.org/n2", "to": "http://example.org/Hitoshi"}, {"from": "http://example.org/n2", "to": "http://example.org/Revolution"}, {"from": "http://example.org/n2", "to": "http://example.org/Sakimoto"}, {"from": "http://example.org/n2", "to": "http://example.org/nation"}, {"from": "http://example.org/n2", "to": "http://example.org/Unrecorded"}, {"from": "http://example.org/n2", "to": "http://example.org/Chronicles"}, {"from": "http://example.org/n2", "to": "http://example.org/name"}, {"from": "http://example.org/n2", "to": "http://example.org/III"}, {"from": "http://example.org/p3", "to": "http://example.org/o3"}, {"from": "http://example.org/p3", "to": "http://example.org/perform-02"}, {"from": "http://example.org/p3", "to": "http://example.org/previous"}, {"from": "http://example.org/p3", "to": "http://example.org/ii"}, {"from": "http://example.org/p3", "to": "http://example.org/a2"}, {"from": "http://example.org/p3", "to": "http://example.org/u"}, {"from": "http://example.org/p3", "to": "http://example.org/praise-01"}, {"from": "http://example.org/o3", "to": "http://example.org/operation"}, {"from": "http://example.org/o3", "to": "http://example.org/s3"}, {"from": "http://example.org/ii", "to": "http://example.org/it"}, {"from": "http://example.org/y", "to": "http://example.org/t"}, {"from": "http://example.org/y", "to": "http://example.org/year"}, {"from": "http://example.org/o2", "to": "http://example.org/2"}, {"from": "http://example.org/o2", "to": "http://example.org/ordinal-entity"}, {"from": "http://example.org/r2", "to": "http://example.org/c"}, {"from": "http://example.org/r2", "to": "http://example.org/g"}, {"from": "http://example.org/r2", "to": "http://example.org/g2"}, {"from": "http://example.org/r2", "to": "http://example.org/refer-01"}, {"from": "http://example.org/r2", "to": "http://example.org/release-01"}, {"from": "http://example.org/r2", "to": "http://example.org/o"}, {"from": "http://example.org/r2", "to": "http://example.org/ii"}, {"from": "http://example.org/c", "to": "http://example.org/common"}, {"from": "http://example.org/c", "to": "http://example.org/country"}, {"from": "http://example.org/c", "to": "http://example.org/company"}, {"from": "http://example.org/c", "to": "http://example.org/n2"}, {"from": "http://example.org/c", "to": "http://example.org/character"}, {"from": "http://example.org/c", "to": "http://example.org/cause-01"}, {"from": "http://example.org/c", "to": "http://example.org/n"}, {"from": "http://example.org/c", "to": "http://example.org/c2"}, {"from": "http://example.org/c", "to": "http://example.org/content"}, {"from": "http://example.org/c", "to": "http://example.org/contrast-01"}, {"from": "http://example.org/e2", "to": "http://example.org/expand-01"}, {"from": "http://example.org/e2", "to": "http://example.org/e"}, {"from": "http://example.org/b", "to": "http://example.org/book"}, {"from": "http://example.org/b", "to": "http://example.org/n"}, {"from": "http://example.org/b", "to": "http://example.org/black-07"}, {"from": "http://example.org/b", "to": "http://example.org/both"}, {"from": "http://example.org/b", "to": "http://example.org/o3"}, {"from": "http://example.org/l", "to": "http://example.org/language"}, {"from": "http://example.org/l", "to": "http://example.org/s"}, {"from": "http://example.org/l", "to": "http://example.org/low-04"}, {"from": "http://example.org/l", "to": "http://example.org/n3"}, {"from": "http://example.org/l", "to": "http://example.org/large"}, {"from": "http://example.org/p5", "to": "http://example.org/portion"}, {"from": "http://example.org/p5", "to": "http://example.org/person"}, {"from": "http://example.org/p5", "to": "http://example.org/l"}, {"from": "http://example.org/p5", "to": "http://example.org/g2"}, {"from": "http://example.org/p5", "to": "http://example.org/w"}, {"from": "http://example.org/g2", "to": "http://example.org/n6"}, {"from": "http://example.org/g2", "to": "http://example.org/n3"}, {"from": "http://example.org/g2", "to": "http://example.org/n2"}, {"from": "http://example.org/g2", "to": "http://example.org/n"}, {"from": "http://example.org/g2", "to": "http://example.org/game"}, {"from": "http://example.org/n6", "to": "http://example.org/Portable"}, {"from": "http://example.org/n6", "to": "http://example.org/Valkyria"}, {"from": "http://example.org/n6", "to": "http://example.org/Chronicles"}, {"from": "http://example.org/n6", "to": "http://example.org/II"}, {"from": "http://example.org/n6", "to": "http://example.org/PlayStation"}, {"from": "http://example.org/n6", "to": "http://example.org/name"}, {"from": "http://example.org/a4", "to": "http://example.org/also"}, {"from": "http://example.org/n4", "to": "http://example.org/name"}, {"from": "http://example.org/n4", "to": "http://example.org/War"}, {"from": "http://example.org/n4", "to": "http://example.org/Sega"}, {"from": "http://example.org/n4", "to": "http://example.org/Valkyria"}, {"from": "http://example.org/n4", "to": "http://example.org/Europan"}, {"from": "http://example.org/n4", "to": "http://example.org/II"}, {"from": "http://example.org/n4", "to": "http://example.org/Chronicles"}, {"from": "http://example.org/m", "to": "http://example.org/s"}, {"from": "http://example.org/m", "to": "http://example.org/multiple"}, {"from": "http://example.org/m", "to": "http://example.org/military"}, {"from": "http://example.org/m", "to": "http://example.org/multi-sentence"}, {"from": "http://example.org/m", "to": "http://example.org/manga"}, {"from": "http://example.org/u2", "to": "http://example.org/n5"}, {"from": "http://example.org/u2", "to": "http://example.org/e"}, {"from": "http://example.org/u2", "to": "http://example.org/unit"}, {"from": "http://example.org/d", "to": "http://example.org/2010"}, {"from": "http://example.org/d", "to": "http://example.org/download-01"}, {"from": "http://example.org/d", "to": "http://example.org/develop-02"}, {"from": "http://example.org/d", "to": "http://example.org/c"}, {"from": "http://example.org/d", "to": "http://example.org/g3"}, {"from": "http://example.org/d", "to": "http://example.org/2014"}, {"from": "http://example.org/d", "to": "http://example.org/date-entity"}, {"from": "http://example.org/d", "to": "http://example.org/2011"}, {"from": "http://example.org/d", "to": "http://example.org/g"}, {"from": "http://example.org/d", "to": "http://example.org/design-01"}, {"from": "http://example.org/d", "to": "http://example.org/1"}, {"from": "http://example.org/d", "to": "http://example.org/p"}, {"from": "http://example.org/b2", "to": "http://example.org/n4"}, {"from": "http://example.org/b2", "to": "http://example.org/l"}, {"from": "http://example.org/b2", "to": "http://example.org/n2"}, {"from": "http://example.org/b2", "to": "http://example.org/book"}, {"from": "http://example.org/s", "to": "http://example.org/series"}, {"from": "http://example.org/s", "to": "http://example.org/f2"}, {"from": "http://example.org/s", "to": "http://example.org/script"}, {"from": "http://example.org/s", "to": "http://example.org/a3"}, {"from": "http://example.org/s", "to": "http://example.org/sing-01"}, {"from": "http://example.org/s", "to": "http://example.org/story"}, {"from": "http://example.org/s", "to": "http://example.org/g"}, {"from": "http://example.org/s", "to": "http://example.org/t"}, {"from": "http://example.org/s", "to": "http://example.org/sell-01"}, {"from": "http://example.org/s", "to": "http://example.org/standard-02"}, {"from": "http://example.org/s", "to": "http://example.org/o"}, {"from": "http://example.org/w2", "to": "http://example.org/work-01"}, {"from": "http://example.org/w2", "to": "http://example.org/p5"}, {"from": "http://example.org/f2", "to": "http://example.org/feature"}, {"from": "http://example.org/f2", "to": "http://example.org/s2"}, {"from": "http://example.org/o", "to": "http://example.org/t"}, {"from": "http://example.org/o", "to": "http://example.org/outside"}, {"from": "http://example.org/o", "to": "http://example.org/1"}, {"from": "http://example.org/o", "to": "http://example.org/3"}, {"from": "http://example.org/o", "to": "http://example.org/open-01"}, {"from": "http://example.org/o", "to": "http://example.org/c2"}, {"from": "http://example.org/o", "to": "http://example.org/ordinal-entity"}, {"from": "http://example.org/o", "to": "http://example.org/original"}, {"from": "http://example.org/d2", "to": "http://example.org/date-entity"}, {"from": "http://example.org/d2", "to": "http://example.org/director"}, {"from": "http://example.org/d2", "to": "http://example.org/y"}, {"from": "http://example.org/d2", "to": "http://example.org/11"}, {"from": "http://example.org/v", "to": "http://example.org/video"}, {"from": "http://example.org/s2", "to": "http://example.org/u"}, {"from": "http://example.org/s2", "to": "http://example.org/n2"}, {"from": "http://example.org/s2", "to": "http://example.org/c"}, {"from": "http://example.org/s2", "to": "http://example.org/sell-01"}, {"from": "http://example.org/s2", "to": "http://example.org/p2"}, {"from": "http://example.org/s2", "to": "http://example.org/series"}, {"from": "http://example.org/s2", "to": "http://example.org/w"}, {"from": "http://example.org/s2", "to": "http://example.org/serve-01"}, {"from": "http://example.org/g3", "to": "http://example.org/game"}, {"from": "http://example.org/g3", "to": "http://example.org/n6"}, {"from": "http://example.org/m3", "to": "http://example.org/more"}, {"from": "http://example.org/s3", "to": "http://example.org/secret"}, {"from": "http://example.org/a3", "to": "http://example.org/animation"}, {"from": "http://example.org/a3", "to": "http://example.org/v"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -80000,
+            "springConstant": 0.001,
+            "springLength": 250
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
