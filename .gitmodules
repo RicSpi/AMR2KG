@@ -1,0 +1,3 @@
+[submodule "amr_coref"]
+	path = amr_coref
+	url = https://github.com/bjascob/amr_coref.git
