@@ -1,4 +1,5 @@
 import penman
+import subprocess
 from   penman.models.noop import NoOpModel
 from amr_coref.amr_coref.coref.inference import Inference
 
@@ -89,15 +90,31 @@ class Document:
 
                     
     # Using external script with subprocess.Popen
-    def convert_amr_to_rdf(self, amr_text, format_option='n3'):
+    def convert_amr_to_rdf(self, sentence_id, format_option='n3'):
         
-        command = ["python","amr-ld","amr_to_rdf.py", "-i", "-", "-o", "-", "-f", format_option]     
-        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        stdout, stderr = process.communicate(input=amr_text)
-        if process.returncode != 0:
-            print(f"Error in converting AMR to RDF: {stderr}")
-            return None
-        return stdout
+        # Load the sentence AMR with metadata 
+        sentence_content = self.sentences[sentence_id][2] 
+        
+        # Path to the external script
+        script_path = 'amr-ld/my_amr_to_rdf.py'
+
+        # Build the subprocess command
+        command = [
+            'python', script_path,
+            '-f', format_option
+        ]
+
+        try:
+            # Run the external script, communicating via pipes
+            with subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True) as process:
+                # Write the sentence content to the script's stdin
+                rdf_data, _ = process.communicate(input=sentence_content)
+
+                # Store the RDF data Document class
+                self.sentences_rdf.append(rdf_data)
+        except subprocess.CalledProcessError as e:
+            print(f"Error: {e}")
+            return
 
 
     def process_amr_to_rdf(self):
