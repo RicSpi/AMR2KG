@@ -236,3 +236,4 @@ class Document:
 
         # Return None if no ID field is found
         return None
+
