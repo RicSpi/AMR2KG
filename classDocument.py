@@ -2,7 +2,10 @@ import penman
 import subprocess
 import re
 import rdflib
-from   penman.models.noop import NoOpModel
+from rdflib.namespace import RDF, RDFS
+from pyvis.network import Network
+import networkx as nx
+from penman.models.noop import NoOpModel
 from amr_coref.amr_coref.coref.inference import Inference
 
 class Document:
@@ -182,6 +185,8 @@ class Document:
         for index, sentence_tuple in enumerate(self.sentences):
             self.convert_amr_to_rdf(index)
 
+    ## GRAPHS
+            
     def generate_document_rdf(self):
         """
         Generates RDF Graph for the entire document based on individual sentence RDF graphs.
@@ -213,6 +218,69 @@ class Document:
             print(f"Error generating document RDF: {e}")
             # Handle the error as needed; the returned RDF graph may be incomplete.
         return document_rdf_graph
+    
+
+    def link_coreference_in_rdf(self):
+        """
+        Links coreferencing variables in the document-level RDF graph.
+
+        Converts all sentences to RDF, generates a document-level RDF graph,
+        defines the coreference namespace, generates cluster URIs, and iterates
+        over coreference clusters to add nodes representing the clusters and links
+        variables to the coreference cluster nodes using 'sameAs' edge.
+
+        Returns:
+        rdflib.Graph: The document-level RDF graph with coreference links.
+        """
+        # Convert all sentences to RDF
+        self.all_sentences_to_rdf()
+
+        # Generate document-level RDF graph
+        g = self.generate_document_rdf()
+
+        # Define the coreference namespace
+        coreference = rdflib.Namespace("http://example.org/cluster/")
+        # Extract the article namespace dynamically from the first sentence's AMR representation
+        article_namespace = self.extract_article_namespace()
+
+        # Generate relations clusters URIs
+        relations_uris = self.generate_clusters_uris()
+
+        # Iterate over coreference clusters
+        for relation, cluster in self.coreference_clusters.items():
+            # if coref clusters are initialized
+            if len(cluster) > 1:
+                # Access cluster URI 
+                relation_node_uri = relations_uris[relation]
+
+                # Add a new node representing the coreference cluster
+                g.add((rdflib.URIRef(relation_node_uri), RDF.type, coreference.Cluster))
+                g.add((rdflib.URIRef(relation_node_uri), RDFS.label, rdflib.Literal(f"Cluster {relation}")))
+
+                # Link variables to the coreference cluster node using 'sameAs' edge
+                for sentence_index, variable_name in cluster:
+
+                    # Construct the URI for the variable node
+                    variable_node_uri = f"http://amr.isi.edu/amr_data/{article_namespace}.sent{sentence_index + 1}#{variable_name}"
+
+                    # Link the variable node to the coreference cluster node using 'sameAs' edge
+                    g.add((rdflib.URIRef(variable_node_uri), coreference.sameAs, rdflib.URIRef(relation_node_uri)))
+
+        return g
+    
+    def generate_clusters_uris(self):
+        """
+        USAGE
+        generate_cluster_uris(document.coreference_clusters)
+        """
+        base_uri="http://example.org/cluster/"
+        cluster_uris = {}
+        for rel in self.coreference_clusters.keys():
+            cluster_uri = f"{base_uri}{rel}"
+            cluster_uris[rel] = cluster_uri
+
+        return cluster_uris
+
 
 
     def extract_article_namespace(self):
@@ -237,3 +305,37 @@ class Document:
         # Return None if no ID field is found
         return None
 
+### Our of class methods
+    
+def visualize_rdf_graph(rdf_graph, filename="RDF_Visualization.html"):
+    # Create a NetworkX graph from RDF
+    if isinstance(rdf_graph, str):
+        # Parse the N3-formatted string
+        graph = rdflib.Graph()
+        graph.parse(data=rdf_graph, format="n3")
+    else:
+        graph = rdf_graph
+
+    nx_graph = nx.Graph()
+
+    for s, p, o in graph:
+        nx_graph.add_node(s)
+        nx_graph.add_node(o)
+        nx_graph.add_edge(s, o, label=p)  # Set the label directly here
+
+    # Create a pyvis network
+    nt = Network(height="750px", width="1000px", notebook=True, cdn_resources='remote')
+    nt.barnes_hut()
+
+    # Add nodes to the pyvis network
+    for node in nx_graph.nodes():
+        nt.add_node(node, title=str(node))
+
+    # Add edges to the pyvis network
+    for edge in nx_graph.edges(data=True):
+        source, target, data = edge
+        label = data['label']  # Extract the label from the edge data
+        nt.add_edge(source, target, title=str(label))  # Set the title to the label
+
+    nt.show_buttons()
+    nt.show(filename)
