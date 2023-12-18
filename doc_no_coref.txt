@@ -1,0 +1,941 @@
+@prefix ns1: <http://amr.isi.edu/frames/ld/v1.2.2/> .
+@prefix ns2: <http://amr.isi.edu/rdf/core-amr#> .
+@prefix ns3: <http://amr.isi.edu/rdf/amr-terms#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ns2:Concept a rdfs:Class ;
+    rdfs:label "AMR-Concept" .
+
+ns2:Role a rdfs:Class ;
+    rdfs:label "AMR-Role" .
+
+<http://amr.isi.edu/amr_data/article1.sent1#l2> a ns1:light-04 ;
+    ns1:light-04.ARG1 <http://amr.isi.edu/amr_data/article1.sent1#b2> .
+
+<http://amr.isi.edu/amr_data/article1.sent1#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent1" ;
+    ns2:has-sentence "Senjō no Valkyria 3 : Unrecorded Chronicles ( Japanese : 戦場のヴァルキュリア3 , lit ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent1#t> .
+
+<http://amr.isi.edu/amr_data/article1.sent10#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent10" ;
+    ns2:has-sentence "It was also adapted into manga and an original video animation series ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent10#a> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#c3> a ns3:compatible ;
+    ns1:compatible.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#t> ;
+    ns3:prep-with <http://amr.isi.edu/amr_data/article1.sent11#e> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#e2> a ns1:expand-01 ;
+    ns1:expand-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#e> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#l> a ns1:low-04 ;
+    ns1:low-04.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#s> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent11" ;
+    ns2:has-sentence "Due to low sales of Valkyria Chronicles II , Valkyria Chronicles III was not localized , but a fan translation compatible with the game 's expanded edition was released in 2014 ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent11#c> .
+
+<http://amr.isi.edu/amr_data/article1.sent12#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent12" ;
+    ns2:has-sentence "Media.Vision would return to the franchise with the development of Valkyria : Azure Revolution for the PlayStation 4 ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent12#r> .
+
+<http://amr.isi.edu/amr_data/article1.sent2#d> a ns1:develop-02 ;
+    ns1:develop-02.ARG0 <http://amr.isi.edu/amr_data/article1.sent2#a> ;
+    ns1:develop-02.ARG1 <http://amr.isi.edu/amr_data/article1.sent2#r> ;
+    ns1:develop-02.ARG3 <http://amr.isi.edu/amr_data/article1.sent2#g3> .
+
+<http://amr.isi.edu/amr_data/article1.sent2#r2> a ns1:refer-01 ;
+    ns1:refer-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent2#g> ;
+    ns1:refer-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent2#g2> ;
+    ns3:location <http://amr.isi.edu/amr_data/article1.sent2#o> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent2#c> .
+
+<http://amr.isi.edu/amr_data/article1.sent2#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent2" ;
+    ns2:has-sentence "Valkyria of the Battlefield 3 ) , commonly referred to as Valkyria Chronicles III outside Japan , is a tactical role @-@ playing video game developed by Sega and Media.Vision for the PlayStation Portable ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent2#r> .
+
+<http://amr.isi.edu/amr_data/article1.sent3#g2> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "Valkyria series" ;
+    ns3:part <http://amr.isi.edu/amr_data/article1.sent3#g> .
+
+<http://amr.isi.edu/amr_data/article1.sent3#r> a ns1:release-01 ;
+    ns1:release-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent3#g> ;
+    ns3:location <http://amr.isi.edu/amr_data/article1.sent3#c> ;
+    ns3:time <http://amr.isi.edu/amr_data/article1.sent3#d> .
+
+<http://amr.isi.edu/amr_data/article1.sent3#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent3" ;
+    ns2:has-sentence "Released in January 2011 in Japan , it is the third game in the Valkyria series ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent3#g> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#b> a ns1:black-07 ;
+    ns1:black-07.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#o3> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#c> a ns1:cause-01 ;
+    ns1:cause-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent4#c2> ;
+    ns1:cause-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#a> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#p3> a ns1:perform-02 ;
+    ns1:perform-02.ARG0 <http://amr.isi.edu/amr_data/article1.sent4#u> ;
+    ns1:perform-02.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#o3> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#p4> a ns1:pit-01 ;
+    ns1:pit-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#u> ;
+    ns1:pit-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent4#u2> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent4" ;
+    ns2:has-sentence "Employing the same fusion of tactical and real @-@ time gameplay as its predecessors , the story runs parallel to the first game and follows the \" Nameless \" , a penal military unit serving the nation of Gallia during the Second Europan War who perform secret black operations and are pitted against the Imperial unit \" Calamaty Raven \" .The game began development in 2010 , carrying over a large portion of the work done on Valkyria Chronicles II ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent4#a> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#s2> a ns1:serve-01 ;
+    ns1:serve-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent4#u> ;
+    ns1:serve-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent4#n2> ;
+    ns3:time <http://amr.isi.edu/amr_data/article1.sent4#w> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#n> a ns1:new-01 ;
+    ns1:new-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent5#p> ;
+    ns1:new-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent5#g> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent5" ;
+    ns2:has-sentence "While it retained the standard features of the series , it also underwent multiple adjustments , such as making the game more forgiving for series newcomers ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent5#u> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#s> a ns1:standard-02 ;
+    ns1:standard-02.ARG1 <http://amr.isi.edu/amr_data/article1.sent5#f2> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#c2> a ns1:compose-01 ;
+    ns1:compose-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent6#p2> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#d> a ns1:design-01 ;
+    ns1:design-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent6#p> ;
+    ns1:design-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent6#c> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#h> a ns1:have-org-role-91 ;
+    ns1:have-org-role-91.ARG0 <http://amr.isi.edu/amr_data/article1.sent6#p4> ;
+    ns1:have-org-role-91.ARG1 <http://amr.isi.edu/amr_data/article1.sent6#b2> ;
+    ns1:have-org-role-91.ARG2 <http://amr.isi.edu/amr_data/article1.sent6#d2> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent6" ;
+    ns2:has-sentence "Character designer Raita Honjou and composer Hitoshi Sakimoto both returned from previous entries , along with Valkyria Chronicles II director Takeshi Ozawa ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent6#r> .
+
+<http://amr.isi.edu/amr_data/article1.sent7#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent7" ;
+    ns2:has-sentence "A large team of writers handled the script ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent7#h> .
+
+<http://amr.isi.edu/amr_data/article1.sent7#w> a ns1:write-01 ;
+    ns1:write-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent7#p> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#c2> a ns1:criticize-01 ;
+    ns1:criticize-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent8#p4> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#o> a ns1:open-01 ;
+    ns1:open-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent8#t> ;
+    ns1:open-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent8#g> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent8" ;
+    ns2:has-sentence "The game 's opening theme was sung by May 'n .It met with positive sales in Japan , and was praised by both Japanese and western critics ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent8#m> .
+
+<http://amr.isi.edu/amr_data/article1.sent9#d> a ns1:download-01 ;
+    ns1:download-01.ARG3 <http://amr.isi.edu/amr_data/article1.sent9#c> .
+
+<http://amr.isi.edu/amr_data/article1.sent9#e2> a ns1:expand-01 ;
+    ns1:expand-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent9#e> .
+
+<http://amr.isi.edu/amr_data/article1.sent9#root01> a ns2:AMR ;
+    ns2:has-id "article1.sent9" ;
+    ns2:has-sentence "After release , it received downloadable content , along with an expanded edition in November of that year ." ;
+    ns2:root <http://amr.isi.edu/amr_data/article1.sent9#r> .
+
+ns1:adapt-01.ARG1 a ns1:FrameRole .
+
+ns1:adapt-01.ARG3 a ns1:FrameRole .
+
+ns1:adjust-01.ARG0 a ns1:FrameRole .
+
+ns1:black-07.ARG1 a ns1:FrameRole .
+
+ns1:carry-over-02.ARG0 a ns1:FrameRole .
+
+ns1:carry-over-02.ARG1 a ns1:FrameRole .
+
+ns1:cause-01.ARG0 a ns1:FrameRole .
+
+ns1:cause-01.ARG1 a ns1:FrameRole .
+
+ns1:compatible.ARG1 a ns1:FrameRole .
+
+ns1:compose-01.ARG0 a ns1:FrameRole .
+
+ns1:contrast-01.ARG1 a ns1:FrameRole .
+
+ns1:contrast-01.ARG2 a ns1:FrameRole .
+
+ns1:criticize-01.ARG0 a ns1:FrameRole .
+
+ns1:design-01.ARG0 a ns1:FrameRole .
+
+ns1:design-01.ARG1 a ns1:FrameRole .
+
+ns1:develop-02.ARG0 a ns1:FrameRole .
+
+ns1:develop-02.ARG1 a ns1:FrameRole .
+
+ns1:develop-02.ARG3 a ns1:FrameRole .
+
+ns1:download-01.ARG3 a ns1:FrameRole .
+
+ns1:expand-01.ARG1 a ns1:FrameRole .
+
+ns1:follow-01.ARG1 a ns1:FrameRole .
+
+ns1:follow-01.ARG2 a ns1:FrameRole .
+
+ns1:forgive-01.ARG0 a ns1:FrameRole .
+
+ns1:forgive-01.ARG1 a ns1:FrameRole .
+
+ns1:handle-01.ARG0 a ns1:FrameRole .
+
+ns1:handle-01.ARG1 a ns1:FrameRole .
+
+ns1:have-degree-91.ARG1 a ns1:FrameRole .
+
+ns1:have-degree-91.ARG2 a ns1:FrameRole .
+
+ns1:have-degree-91.ARG3 a ns1:FrameRole .
+
+ns1:have-org-role-91.ARG0 a ns1:FrameRole .
+
+ns1:have-org-role-91.ARG1 a ns1:FrameRole .
+
+ns1:have-org-role-91.ARG2 a ns1:FrameRole .
+
+ns1:light-04.ARG1 a ns1:FrameRole .
+
+ns1:localized-02.ARG1 a ns1:FrameRole .
+
+ns1:low-04.ARG1 a ns1:FrameRole .
+
+ns1:make-02.ARG0 a ns1:FrameRole .
+
+ns1:make-02.ARG1 a ns1:FrameRole .
+
+ns1:meet-01.ARG0 a ns1:FrameRole .
+
+ns1:meet-01.ARG1 a ns1:FrameRole .
+
+ns1:new-01.ARG1 a ns1:FrameRole .
+
+ns1:new-01.ARG2 a ns1:FrameRole .
+
+ns1:open-01.ARG0 a ns1:FrameRole .
+
+ns1:open-01.ARG1 a ns1:FrameRole .
+
+ns1:parallel-01.ARG1 a ns1:FrameRole .
+
+ns1:parallel-01.ARG2 a ns1:FrameRole .
+
+ns1:perform-02.ARG0 a ns1:FrameRole .
+
+ns1:perform-02.ARG1 a ns1:FrameRole .
+
+ns1:pit-01.ARG1 a ns1:FrameRole .
+
+ns1:pit-01.ARG2 a ns1:FrameRole .
+
+ns1:portion.ARG1 a ns1:FrameRole .
+
+ns1:praise-01.ARG0 a ns1:FrameRole .
+
+ns1:praise-01.ARG1 a ns1:FrameRole .
+
+ns1:receive-01.ARG0 a ns1:FrameRole .
+
+ns1:receive-01.ARG1 a ns1:FrameRole .
+
+ns1:refer-01.ARG1 a ns1:FrameRole .
+
+ns1:refer-01.ARG2 a ns1:FrameRole .
+
+ns1:release-01.ARG1 a ns1:FrameRole .
+
+ns1:retain-01.ARG0 a ns1:FrameRole .
+
+ns1:retain-01.ARG1 a ns1:FrameRole .
+
+ns1:return-01.ARG1 a ns1:FrameRole .
+
+ns1:return-01.ARG3 a ns1:FrameRole .
+
+ns1:return-01.ARG4 a ns1:FrameRole .
+
+ns1:sell-01.ARG1 a ns1:FrameRole .
+
+ns1:serve-01.ARG0 a ns1:FrameRole .
+
+ns1:serve-01.ARG2 a ns1:FrameRole .
+
+ns1:sing-01.ARG0 a ns1:FrameRole .
+
+ns1:sing-01.ARG1 a ns1:FrameRole .
+
+ns1:standard-02.ARG1 a ns1:FrameRole .
+
+ns1:title-01.ARG1 a ns1:FrameRole .
+
+ns1:title-01.ARG2 a ns1:FrameRole .
+
+ns1:translate-01.ARG2 a ns1:FrameRole .
+
+ns1:undergo-28.ARG1 a ns1:FrameRole .
+
+ns1:undergo-28.ARG2 a ns1:FrameRole .
+
+ns1:work-01.ARG1 a ns1:FrameRole .
+
+ns1:write-01.ARG0 a ns1:FrameRole .
+
+ns3:accompanier a ns2:Role .
+
+ns3:concession a ns2:Role .
+
+ns3:consist a ns2:Role .
+
+ns3:domain a ns2:Role .
+
+ns3:example a ns2:Role .
+
+ns3:location a ns2:Role .
+
+ns3:manner a ns2:Role .
+
+ns3:medium a ns2:Role .
+
+ns3:mod a ns2:Role .
+
+ns3:op1 a ns2:Role .
+
+ns3:op2 a ns2:Role .
+
+ns3:ord a ns2:Role .
+
+ns3:part a ns2:Role .
+
+ns3:part-of a ns2:Role .
+
+ns3:poss a ns2:Role .
+
+ns3:prep-with a ns2:Role .
+
+ns3:purpose a ns2:Role .
+
+ns3:quant a ns2:Role .
+
+ns3:snt1 a ns2:Role .
+
+ns3:snt2 a ns2:Role .
+
+ns3:time a ns2:Role .
+
+<http://amr.isi.edu/amr_data/article1.sent1#b> a <http://amr.isi.edu/entity-types#book> ;
+    rdfs:label "Senjō no Valkyria 3" .
+
+<http://amr.isi.edu/amr_data/article1.sent1#l> a <http://amr.isi.edu/entity-types#language> ;
+    rdfs:label "Japanese" .
+
+<http://amr.isi.edu/amr_data/article1.sent1#t> a ns1:title-01 ;
+    ns1:title-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent1#b> ;
+    ns1:title-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent1#b2> .
+
+<http://amr.isi.edu/amr_data/article1.sent10#a> a ns1:adapt-01 ;
+    ns1:adapt-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent10#ii> ;
+    ns1:adapt-01.ARG3 <http://amr.isi.edu/amr_data/article1.sent10#a2> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent10#a4> .
+
+<http://amr.isi.edu/amr_data/article1.sent10#a2> a ns2:and ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent10#m> ;
+    ns3:op2 <http://amr.isi.edu/amr_data/article1.sent10#s> .
+
+<http://amr.isi.edu/amr_data/article1.sent10#a3> a ns3:animation ;
+    ns3:medium <http://amr.isi.edu/amr_data/article1.sent10#v> .
+
+<http://amr.isi.edu/amr_data/article1.sent10#a4> a ns3:also .
+
+<http://amr.isi.edu/amr_data/article1.sent10#ii> a ns3:it .
+
+<http://amr.isi.edu/amr_data/article1.sent10#m> a ns3:manga .
+
+<http://amr.isi.edu/amr_data/article1.sent10#o> a ns3:original .
+
+<http://amr.isi.edu/amr_data/article1.sent10#s> a ns3:series ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent10#a3>,
+        <http://amr.isi.edu/amr_data/article1.sent10#o> .
+
+<http://amr.isi.edu/amr_data/article1.sent10#v> a ns3:video .
+
+<http://amr.isi.edu/amr_data/article1.sent11#c> a ns1:contrast-01 ;
+    ns1:contrast-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#c2> ;
+    ns1:contrast-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent11#r> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#c2> a ns1:cause-01 ;
+    ns1:cause-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent11#s> ;
+    ns1:cause-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#l2> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#d> a ns2:date-entity ;
+    ns3:year "2014" .
+
+<http://amr.isi.edu/amr_data/article1.sent11#f> a ns3:fan .
+
+<http://amr.isi.edu/amr_data/article1.sent11#g2> a <http://amr.isi.edu/entity-types#game> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#l2> a ns1:localized-02 ;
+    ns1:localized-02.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#g> ;
+    ns3:polarity "-" .
+
+<http://amr.isi.edu/amr_data/article1.sent11#r> a ns1:release-01 ;
+    ns1:release-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#t> ;
+    ns3:time <http://amr.isi.edu/amr_data/article1.sent11#d> .
+
+<http://amr.isi.edu/amr_data/article1.sent12#d> a ns1:develop-02 ;
+    ns1:develop-02.ARG0 <http://amr.isi.edu/amr_data/article1.sent12#c> ;
+    ns1:develop-02.ARG1 <http://amr.isi.edu/amr_data/article1.sent12#g> .
+
+<http://amr.isi.edu/amr_data/article1.sent12#f> a ns3:franchise .
+
+<http://amr.isi.edu/amr_data/article1.sent12#g> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "Valkyria Azure Revolution" ;
+    ns3:purpose <http://amr.isi.edu/amr_data/article1.sent12#g2> .
+
+<http://amr.isi.edu/amr_data/article1.sent12#g2> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "PS4" .
+
+<http://amr.isi.edu/amr_data/article1.sent12#r> a ns1:return-01 ;
+    ns1:return-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent12#c> ;
+    ns1:return-01.ARG4 <http://amr.isi.edu/amr_data/article1.sent12#f> ;
+    ns3:manner <http://amr.isi.edu/amr_data/article1.sent12#d> .
+
+<http://amr.isi.edu/amr_data/article1.sent2#a> a ns2:and ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent2#c3> ;
+    ns3:op2 <http://amr.isi.edu/amr_data/article1.sent2#c4> .
+
+<http://amr.isi.edu/amr_data/article1.sent2#c> a ns3:common .
+
+<http://amr.isi.edu/amr_data/article1.sent2#c2> a <http://amr.isi.edu/entity-types#country> ;
+    rdfs:label "Japan" .
+
+<http://amr.isi.edu/amr_data/article1.sent2#c3> a <http://amr.isi.edu/entity-types#company> ;
+    rdfs:label "Sega" .
+
+<http://amr.isi.edu/amr_data/article1.sent2#c4> a <http://amr.isi.edu/entity-types#company> ;
+    rdfs:label "Media.Vision" .
+
+<http://amr.isi.edu/amr_data/article1.sent2#g2> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "Valkyria Chronicles III" .
+
+<http://amr.isi.edu/amr_data/article1.sent2#g3> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "PlayStation Portable" .
+
+<http://amr.isi.edu/amr_data/article1.sent2#o> a ns3:outside ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent2#c2> .
+
+<http://amr.isi.edu/amr_data/article1.sent2#t> a ns3:tactic .
+
+<http://amr.isi.edu/amr_data/article1.sent3#c> a <http://amr.isi.edu/entity-types#country> ;
+    rdfs:label "Japan" .
+
+<http://amr.isi.edu/amr_data/article1.sent3#d> a ns2:date-entity ;
+    ns3:month "1" ;
+    ns3:year "2011" .
+
+<http://amr.isi.edu/amr_data/article1.sent3#ii> a ns3:it .
+
+<http://amr.isi.edu/amr_data/article1.sent3#o> a ns3:ordinal-entity ;
+    ns3:value "3" .
+
+<http://amr.isi.edu/amr_data/article1.sent4#c2> a ns1:carry-over-02 ;
+    ns1:carry-over-02.ARG0 <http://amr.isi.edu/amr_data/article1.sent4#s> ;
+    ns1:carry-over-02.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#w2> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#d> a ns2:date-entity ;
+    ns3:year "2010" .
+
+<http://amr.isi.edu/amr_data/article1.sent4#e> a ns3:empire .
+
+<http://amr.isi.edu/amr_data/article1.sent4#f> a ns1:follow-01 ;
+    ns1:follow-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#s> ;
+    ns1:follow-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent4#u> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#g> a <http://amr.isi.edu/entity-types#game> ;
+    ns3:ord <http://amr.isi.edu/amr_data/article1.sent4#o> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#g2> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "Valkyria Chronicles II" .
+
+<http://amr.isi.edu/amr_data/article1.sent4#l> a ns3:large .
+
+<http://amr.isi.edu/amr_data/article1.sent4#m> a <http://amr.isi.edu/entity-types#military> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#n2> a ns3:nation ;
+    rdfs:label "Gallia" .
+
+<http://amr.isi.edu/amr_data/article1.sent4#o> a ns3:ordinal-entity ;
+    ns3:value "1" .
+
+<http://amr.isi.edu/amr_data/article1.sent4#o2> a ns3:ordinal-entity ;
+    ns3:value "2" .
+
+<http://amr.isi.edu/amr_data/article1.sent4#p> a ns1:parallel-01 ;
+    ns1:parallel-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#s> ;
+    ns1:parallel-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent4#g> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#p2> a ns3:penal .
+
+<http://amr.isi.edu/amr_data/article1.sent4#p5> a ns3:portion ;
+    ns1:portion.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#g2> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent4#l> ;
+    ns3:part-of <http://amr.isi.edu/amr_data/article1.sent4#w2> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#s3> a ns3:secret .
+
+<http://amr.isi.edu/amr_data/article1.sent4#u2> a ns2:unit ;
+    rdfs:label "Calamaty Raven" ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent4#e> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#w> a <http://amr.isi.edu/entity-types#war> ;
+    rdfs:label "Europan War" ;
+    ns3:ord <http://amr.isi.edu/amr_data/article1.sent4#o2> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#a> a ns1:adjust-01 ;
+    ns1:adjust-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent5#ii> ;
+    ns3:example <http://amr.isi.edu/amr_data/article1.sent5#m2> ;
+    ns3:quant <http://amr.isi.edu/amr_data/article1.sent5#m> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#a2> a ns3:also .
+
+<http://amr.isi.edu/amr_data/article1.sent5#f> a ns1:forgive-01 ;
+    ns1:forgive-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent5#g> ;
+    ns1:forgive-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent5#p> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#h> a ns1:have-degree-91 ;
+    ns1:have-degree-91.ARG1 <http://amr.isi.edu/amr_data/article1.sent5#g> ;
+    ns1:have-degree-91.ARG2 <http://amr.isi.edu/amr_data/article1.sent5#f> ;
+    ns1:have-degree-91.ARG3 <http://amr.isi.edu/amr_data/article1.sent5#m3> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#m> a ns3:multiple .
+
+<http://amr.isi.edu/amr_data/article1.sent5#m2> a ns1:make-02 ;
+    ns1:make-02.ARG0 <http://amr.isi.edu/amr_data/article1.sent5#ii> ;
+    ns1:make-02.ARG1 <http://amr.isi.edu/amr_data/article1.sent5#h> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#m3> a ns2:more .
+
+<http://amr.isi.edu/amr_data/article1.sent5#r> a ns1:retain-01 ;
+    ns1:retain-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent5#ii> ;
+    ns1:retain-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent5#f2> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#s2> a ns3:series .
+
+<http://amr.isi.edu/amr_data/article1.sent5#u> a ns1:undergo-28 ;
+    ns1:undergo-28.ARG1 <http://amr.isi.edu/amr_data/article1.sent5#ii> ;
+    ns1:undergo-28.ARG2 <http://amr.isi.edu/amr_data/article1.sent5#a> ;
+    ns3:concession <http://amr.isi.edu/amr_data/article1.sent5#r> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent5#a2> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#a> a ns2:and ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent6#b> ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent6#p> ;
+    ns3:op2 <http://amr.isi.edu/amr_data/article1.sent6#p2> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#b> a ns3:both .
+
+<http://amr.isi.edu/amr_data/article1.sent6#b2> a <http://amr.isi.edu/entity-types#book> ;
+    rdfs:label "Valkyria Chronicles II" .
+
+<http://amr.isi.edu/amr_data/article1.sent6#c> a ns3:character .
+
+<http://amr.isi.edu/amr_data/article1.sent6#d2> a ns3:director .
+
+<http://amr.isi.edu/amr_data/article1.sent6#e> a ns3:entry ;
+    ns3:time <http://amr.isi.edu/amr_data/article1.sent6#p3> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#p3> a ns3:previous .
+
+<http://amr.isi.edu/amr_data/article1.sent6#r> a ns1:return-01 ;
+    ns1:return-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent6#a> ;
+    ns1:return-01.ARG3 <http://amr.isi.edu/amr_data/article1.sent6#e> ;
+    ns3:accompanier <http://amr.isi.edu/amr_data/article1.sent6#p4> .
+
+<http://amr.isi.edu/amr_data/article1.sent7#h> a ns1:handle-01 ;
+    ns1:handle-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent7#t> ;
+    ns1:handle-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent7#s> .
+
+<http://amr.isi.edu/amr_data/article1.sent7#l> a ns3:large .
+
+<http://amr.isi.edu/amr_data/article1.sent7#p> a <http://amr.isi.edu/entity-types#person> ;
+    ns3:consist <http://amr.isi.edu/amr_data/article1.sent7#t> .
+
+<http://amr.isi.edu/amr_data/article1.sent7#s> a ns3:script .
+
+<http://amr.isi.edu/amr_data/article1.sent8#a> a ns2:and ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent8#m2> ;
+    ns3:op2 <http://amr.isi.edu/amr_data/article1.sent8#p3> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#a2> a ns2:and ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent8#p4> ;
+    ns3:op2 <http://amr.isi.edu/amr_data/article1.sent8#p5> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#g> a <http://amr.isi.edu/entity-types#game> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#m> a ns3:multi-sentence ;
+    ns3:snt1 <http://amr.isi.edu/amr_data/article1.sent8#s> ;
+    ns3:snt2 <http://amr.isi.edu/amr_data/article1.sent8#a> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#m2> a ns1:meet-01 ;
+    ns1:meet-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent8#ii> ;
+    ns1:meet-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent8#s2> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#p> a <http://amr.isi.edu/entity-types#person> ;
+    rdfs:label "May'n" .
+
+<http://amr.isi.edu/amr_data/article1.sent8#p2> a ns3:positive .
+
+<http://amr.isi.edu/amr_data/article1.sent8#p3> a ns1:praise-01 ;
+    ns1:praise-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent8#a2> ;
+    ns1:praise-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent8#ii> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#p5> a <http://amr.isi.edu/entity-types#person> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent8#w> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#s> a ns1:sing-01 ;
+    ns1:sing-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent8#p> ;
+    ns1:sing-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent8#t> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#s2> a ns1:sell-01 ;
+    ns3:location <http://amr.isi.edu/amr_data/article1.sent8#c> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent8#p2> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#w> a <http://amr.isi.edu/entity-types#world-region> ;
+    rdfs:label "West" .
+
+<http://amr.isi.edu/amr_data/article1.sent9#a> a ns2:and ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent9#c> ;
+    ns3:op2 <http://amr.isi.edu/amr_data/article1.sent9#e> .
+
+<http://amr.isi.edu/amr_data/article1.sent9#a2> a ns2:after ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent9#r2> .
+
+<http://amr.isi.edu/amr_data/article1.sent9#d2> a ns2:date-entity ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent9#y> ;
+    ns3:month "11" .
+
+<http://amr.isi.edu/amr_data/article1.sent9#r> a ns1:receive-01 ;
+    ns1:receive-01.ARG0 <http://amr.isi.edu/amr_data/article1.sent9#ii> ;
+    ns1:receive-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent9#a> ;
+    ns3:time <http://amr.isi.edu/amr_data/article1.sent9#a2>,
+        <http://amr.isi.edu/amr_data/article1.sent9#d2> .
+
+<http://amr.isi.edu/amr_data/article1.sent9#r2> a ns1:release-01 ;
+    ns1:release-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent9#ii> .
+
+<http://amr.isi.edu/amr_data/article1.sent9#t> a ns2:that .
+
+<http://amr.isi.edu/amr_data/article1.sent9#y> a ns2:year ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent9#t> .
+
+<http://amr.isi.edu/entity-types#language> a ns2:NamedEntity .
+
+<http://amr.isi.edu/entity-types#military> a ns2:NamedEntity .
+
+<http://amr.isi.edu/entity-types#team> a ns2:NamedEntity .
+
+<http://amr.isi.edu/entity-types#war> a ns2:NamedEntity .
+
+<http://amr.isi.edu/entity-types#world-region> a ns2:NamedEntity .
+
+ns1:adapt-01 a ns2:Frame .
+
+ns1:adjust-01 a ns2:Frame .
+
+ns1:black-07 a ns2:Frame .
+
+ns1:carry-over-02 a ns2:Frame .
+
+ns1:compose-01 a ns2:Frame .
+
+ns1:contrast-01 a ns2:Frame .
+
+ns1:criticize-01 a ns2:Frame .
+
+ns1:design-01 a ns2:Frame .
+
+ns1:download-01 a ns2:Frame .
+
+ns1:follow-01 a ns2:Frame .
+
+ns1:forgive-01 a ns2:Frame .
+
+ns1:handle-01 a ns2:Frame .
+
+ns1:have-degree-91 a ns2:Frame .
+
+ns1:have-org-role-91 a ns2:Frame .
+
+ns1:light-04 a ns2:Frame .
+
+ns1:localized-02 a ns2:Frame .
+
+ns1:low-04 a ns2:Frame .
+
+ns1:make-02 a ns2:Frame .
+
+ns1:meet-01 a ns2:Frame .
+
+ns1:new-01 a ns2:Frame .
+
+ns1:open-01 a ns2:Frame .
+
+ns1:parallel-01 a ns2:Frame .
+
+ns1:perform-02 a ns2:Frame .
+
+ns1:pit-01 a ns2:Frame .
+
+ns1:praise-01 a ns2:Frame .
+
+ns1:receive-01 a ns2:Frame .
+
+ns1:refer-01 a ns2:Frame .
+
+ns1:retain-01 a ns2:Frame .
+
+ns1:serve-01 a ns2:Frame .
+
+ns1:sing-01 a ns2:Frame .
+
+ns1:standard-02 a ns2:Frame .
+
+ns1:title-01 a ns2:Frame .
+
+ns1:translate-01 a ns2:Frame .
+
+ns1:undergo-28 a ns2:Frame .
+
+ns1:work-01 a ns2:Frame .
+
+ns1:write-01 a ns2:Frame .
+
+ns3:animation a ns2:Concept .
+
+ns3:both a ns2:Concept .
+
+ns3:character a ns2:Concept .
+
+ns3:common a ns2:Concept .
+
+ns3:compatible a ns2:Concept .
+
+ns3:content a ns2:Concept .
+
+ns3:director a ns2:Concept .
+
+ns3:empire a ns2:Concept .
+
+ns3:entry a ns2:Concept .
+
+ns3:fan a ns2:Concept .
+
+ns3:feature a ns2:Concept .
+
+ns3:franchise a ns2:Concept .
+
+ns3:manga a ns2:Concept .
+
+ns3:multi-sentence a ns2:Concept .
+
+ns3:multiple a ns2:Concept .
+
+ns3:nation a ns2:Concept .
+
+ns3:operation a ns2:Concept .
+
+ns3:original a ns2:Concept .
+
+ns3:outside a ns2:Concept .
+
+ns3:penal a ns2:Concept .
+
+ns3:portion a ns2:Concept .
+
+ns3:positive a ns2:Concept .
+
+ns3:previous a ns2:Concept .
+
+ns3:role a ns2:Concept .
+
+ns3:script a ns2:Concept .
+
+ns3:secret a ns2:Concept .
+
+ns3:story a ns2:Concept .
+
+ns3:tactic a ns2:Concept .
+
+ns3:theme a ns2:Concept .
+
+ns3:video a ns2:Concept .
+
+ns2:after a ns2:Concept .
+
+ns2:more a ns2:Concept .
+
+ns2:that a ns2:Concept .
+
+ns2:year a ns2:Concept .
+
+<http://amr.isi.edu/amr_data/article1.sent1#b2> a <http://amr.isi.edu/entity-types#book> ;
+    rdfs:label "Unrecorded Chronicles" ;
+    ns3:medium <http://amr.isi.edu/amr_data/article1.sent1#l> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#e> a ns3:edition ;
+    ns3:poss <http://amr.isi.edu/amr_data/article1.sent11#g2> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#g> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "Valkyria Chronicles II" .
+
+<http://amr.isi.edu/amr_data/article1.sent11#s> a ns1:sell-01 ;
+    ns1:sell-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent11#g> .
+
+<http://amr.isi.edu/amr_data/article1.sent11#t> a ns1:translate-01 ;
+    ns1:translate-01.ARG2 <http://amr.isi.edu/amr_data/article1.sent11#f> .
+
+<http://amr.isi.edu/amr_data/article1.sent12#c> a <http://amr.isi.edu/entity-types#company> ;
+    rdfs:label "Media.Vision" .
+
+<http://amr.isi.edu/amr_data/article1.sent2#g> a <http://amr.isi.edu/entity-types#game> ;
+    rdfs:label "Valkyria of the Battlefield 3" .
+
+<http://amr.isi.edu/amr_data/article1.sent2#r> a ns3:role ;
+    ns3:domain <http://amr.isi.edu/amr_data/article1.sent2#g> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent2#t> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#a> a ns2:and ;
+    ns3:op1 <http://amr.isi.edu/amr_data/article1.sent4#p> ;
+    ns3:op2 <http://amr.isi.edu/amr_data/article1.sent4#f> ;
+    ns3:time <http://amr.isi.edu/amr_data/article1.sent4#d> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#o3> a ns3:operation ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent4#s3> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#w2> a ns1:work-01 ;
+    ns1:work-01.ARG1 <http://amr.isi.edu/amr_data/article1.sent4#p5> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#f2> a ns3:feature ;
+    ns3:poss <http://amr.isi.edu/amr_data/article1.sent5#s2> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#p> a <http://amr.isi.edu/entity-types#person> .
+
+<http://amr.isi.edu/amr_data/article1.sent6#p> a <http://amr.isi.edu/entity-types#person> ;
+    rdfs:label "Raita Honjou" .
+
+<http://amr.isi.edu/amr_data/article1.sent6#p2> a <http://amr.isi.edu/entity-types#person> ;
+    rdfs:label "Hitoshi Sakimoto" .
+
+<http://amr.isi.edu/amr_data/article1.sent6#p4> a <http://amr.isi.edu/entity-types#person> ;
+    rdfs:label "Takeshi Ozawa" .
+
+<http://amr.isi.edu/amr_data/article1.sent7#t> a <http://amr.isi.edu/entity-types#team> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent7#l> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#c> a <http://amr.isi.edu/entity-types#country> ;
+    rdfs:label "Japan" .
+
+<http://amr.isi.edu/amr_data/article1.sent8#ii> a ns3:it .
+
+<http://amr.isi.edu/amr_data/article1.sent8#p4> a <http://amr.isi.edu/entity-types#person> ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent8#c> .
+
+<http://amr.isi.edu/amr_data/article1.sent8#t> a ns3:theme .
+
+<http://amr.isi.edu/amr_data/article1.sent9#c> a ns3:content .
+
+<http://amr.isi.edu/amr_data/article1.sent9#e> a ns3:edition .
+
+<http://amr.isi.edu/amr_data/article1.sent9#ii> a ns3:it .
+
+ns1:cause-01 a ns2:Frame .
+
+ns1:develop-02 a ns2:Frame .
+
+ns1:expand-01 a ns2:Frame .
+
+ns1:return-01 a ns2:Frame .
+
+ns1:sell-01 a ns2:Frame .
+
+ns3:also a ns2:Concept .
+
+ns3:edition a ns2:Concept .
+
+ns3:large a ns2:Concept .
+
+ns3:series a ns2:Concept .
+
+ns2:unit a ns2:Concept .
+
+<http://amr.isi.edu/amr_data/article1.sent3#g> a <http://amr.isi.edu/entity-types#game> ;
+    ns3:domain <http://amr.isi.edu/amr_data/article1.sent3#ii> ;
+    ns3:ord <http://amr.isi.edu/amr_data/article1.sent3#o> .
+
+<http://amr.isi.edu/amr_data/article1.sent4#s> a ns3:story .
+
+<http://amr.isi.edu/amr_data/article1.sent5#g> a <http://amr.isi.edu/entity-types#game> .
+
+<http://amr.isi.edu/entity-types#book> a ns2:NamedEntity .
+
+<http://amr.isi.edu/entity-types#company> a ns2:NamedEntity .
+
+<http://amr.isi.edu/entity-types#country> a ns2:NamedEntity .
+
+ns1:release-01 a ns2:Frame .
+
+ns3:ordinal-entity a ns2:Concept .
+
+<http://amr.isi.edu/amr_data/article1.sent4#u> a ns2:unit ;
+    rdfs:label "Nameless" ;
+    ns3:mod <http://amr.isi.edu/amr_data/article1.sent4#m>,
+        <http://amr.isi.edu/amr_data/article1.sent4#p2> .
+
+<http://amr.isi.edu/amr_data/article1.sent5#ii> a ns3:it .
+
+ns2:date-entity a ns2:Concept .
+
+ns3:it a ns2:Concept .
+
+ns2:and a ns2:Concept .
+
+<http://amr.isi.edu/entity-types#person> a ns2:NamedEntity .
+
+ns2:NamedEntity a ns2:Concept ;
+    rdfs:label "AMR-EntityType",
+        "AMR-Term" .
+
+<http://amr.isi.edu/entity-types#game> a ns2:NamedEntity .
+
+ns2:Frame a ns2:Concept ;
+    rdfs:label "AMR-PropBank-Frame" .
+
+ns1:FrameRole a ns2:Role ;
+    rdfs:label "AMR-PropBank-Role" .
+

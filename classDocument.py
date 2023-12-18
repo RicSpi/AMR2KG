@@ -1,19 +1,27 @@
 import penman
 import subprocess
+import re
+import rdflib
 from   penman.models.noop import NoOpModel
 from amr_coref.amr_coref.coref.inference import Inference
 
 class Document:
+    """
+    Represents a document with the following attributes:
 
-    # We would like to store, per article:
+    Attributes:
+        title (str): The title of the document.
+        paragraph (str): The content of the document's paragraph.
+        paragraph_amr (str): The AMR of the document's paragraph.
+        sentences (list): A list of 3-tuples representing sentences in the document.
+                          Each tuple contains plain text, AMR, and AMR with metadata.
+        sentences_rdf (list): A list for storing RDF graphs generated while processing the document.
+        coreference_clusters (dict): A dictionary for storing coreference clusters in the document.
+
+    Example:
+        doc = Document('Sample Document', 'This is a sample paragraph.', 'AMR of the paragraph', 
+                       [('Sentence 1', 'AMR 1', 'AMR 1 with metadata'), ('Sentence 2', 'AMR 2', 'AMR 2 with metadata')])
     """
-    1. Title
-    2. Paragraph
-    3. Paragraph level AMR ( As discussed, this is less accurate but we can store it anyway since we have it.)
-    4. (Sentence, Sentence AMR, Sentence AMR with metadata)
-    5. RDF Graphs per sentence. This will be generated with while processing the docs. 
-    """
-    ## Let us create a Class representing each Document
 
     def __init__(self, title, paragraph, paragraph_amr, sentences):
         self.title = title
@@ -24,8 +32,19 @@ class Document:
         self.sentences_rdf = []  # Initialize empty list for storing RDF data
         self.coreference_clusters = {}  # Initialize empty dictionary for storing coreference clusters
 
-
+    ## COREFERENCE METHODS ##
+        
     def resolve_coreference(self, model_dir='amr_coref/data/model_coref-v0.1.0/', device='cpu'):
+        """
+        Resolve coreference in AMR graphs using a pre-trained model.
+
+        Args:
+        model_dir (str, optional): Directory containing the coreference resolution model (default is 'amr_coref/data/model_coref-v0.1.0/').
+        device (str, optional): Device for model inference (default is 'cpu', cuda:0 for GPU).
+
+        Returns:
+        dict: A dictionary containing coreference clusters.
+        """
         # Load the model and test data
         inference = Inference(model_dir, device=device)
 
@@ -45,9 +64,11 @@ class Document:
         """
         Load AMR graphs in penman format from the Document object.
         Needed for the co-reference resolution module.
+
         Returns:
             list: A list of PENMAN graphs.
         """
+        
         ordered_pgraphs = []
 
         for _, _, amr_metadata in self.sentences:
@@ -58,10 +79,23 @@ class Document:
         return ordered_pgraphs
     
     def print_coreference_clusters(self, print_sentence=False):
+        """
+        Print coreference clusters and associated information. 
+        Useful for evaluation and debugging.
+
+        Args:
+        print_sentence (bool, optional): Whether to print the sentence associated with each cluster (default is False).
+
+        Returns:
+        None.
+
+        Example:
+        document.print_coreference_clusters() prints coreference clusters, variable names, and associated words.
+        """
+
         for key in self.coreference_clusters.keys():
             print(f"Key: {key}")
             for values in self.coreference_clusters[key]:
-
                 # Unpack the tuple with sentence index and variable name
                 sentence_id, var_name = values
                 # Lookup the current sentence's AMR from self
@@ -87,17 +121,34 @@ class Document:
                 if print_sentence:
                     print(f"    Sentence:{sentence}")
 
+    ## AMR2RDF METHODS ##
 
-                    
-    # Using external script with subprocess.Popen
     def convert_amr_to_rdf(self, sentence_id, format_option='n3'):
+        """
+        Converts an Abstract Meaning Representation (AMR) to Resource Description Framework (RDF) format
+        using an external script through subprocess.Popen.
+
+        Args:
+        sentence_id (int): The index of the sentence in 'sentences' to convert.
+        format_option (str, optional): The RDF serialization format option (default is 'n3', Turtle format).
+
+        Raises:
+        subprocess.CalledProcessError: If the external script execution encounters an error.
+
+        Returns:
+        None: The RDF data is stored in 'sentences_rdf' attribute.
+
+        Example:
+        Consider 'sentences' with AMR  and calling convert_amr_to_rdf(0) would convert
+        the first sentence's AMR to RDF using the 'n3' format and store the result in 'sentences_rdf'.
+
+        TO_DO: Decouple this from the sentence id, so that it can be used in more scenarios.
+        """
         
         # Load the sentence AMR with metadata 
         sentence_content = self.sentences[sentence_id][2] 
-        
-        # Path to the external script
+        # Path to the external script (this file is the butchered version of the OG)
         script_path = 'amr-ld/my_amr_to_rdf.py'
-
         # Build the subprocess command
         command = [
             'python', script_path,
@@ -105,20 +156,83 @@ class Document:
         ]
 
         try:
-            # Run the external script, communicating via pipes
+            # Run the external script, communicating via pipes (How this is working is kinda obscure to me)
             with subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True) as process:
                 # Write the sentence content to the script's stdin
                 rdf_data, _ = process.communicate(input=sentence_content)
-
                 # Store the RDF data Document class
                 self.sentences_rdf.append(rdf_data)
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
             return
 
+    def all_sentences_to_rdf(self):
+        """
+        Converts all sentences in the instance to RDF format.
 
-    def process_amr_to_rdf(self):
-        # Process AMR to RDF for sentences
-        for _, _, amr_meta in self.sentences:
-            rdf_content = self.convert_amr_to_rdf(amr_meta)
-            self.sentences_rdf.append(rdf_content)
+        This function iterates through the list of sentences stored in the instance
+        and calls the 'convert_amr_to_rdf' method for each sentence.
+
+        Parameters:
+        - self: The instance of the class containing the 'sentences' attribute.
+        Returns:
+        None
+        """
+
+        for index, sentence_tuple in enumerate(self.sentences):
+            self.convert_amr_to_rdf(index)
+
+    def generate_document_rdf(self):
+        """
+        Generates RDF Graph for the entire document based on individual sentence RDF graphs.
+
+        This method combines RDF graphs generated for individual sentences. 
+        Iterates through the 'sentences_rdf' attribute, parses each sentence's RDF data
+        and adds it to the 'document_rdf_graph'. The resulting RDF graph for the entire document is then returned.
+
+        It handles errors for non-initialized sentence_rdf attribute (<2) and parsing errors.
+
+        Parameters:
+        - self: The instance of the class containing the 'sentences_rdf' attribute.
+
+        Returns:
+        A combined RDF graph representing the entire document.
+        """
+
+        document_rdf_graph = rdflib.Graph()
+        try:
+            # Check if there are less than two sentences
+            if len(self.sentences_rdf) < 2:
+                raise ValueError("Insufficient sentences to generate document RDF. Process all sentences first.")
+
+            for graph in self.sentences_rdf:
+                temp_graph = rdflib.Graph()
+                document_rdf_graph += temp_graph.parse(data=graph, format="n3")
+
+        except Exception as e:
+            print(f"Error generating document RDF: {e}")
+            # Handle the error as needed; the returned RDF graph may be incomplete.
+        return document_rdf_graph
+
+
+    def extract_article_namespace(self):
+        """
+        Extracts and returns the article namespace from the first line of the AMR.
+        This is a workaround for the hardcoded IDs generated for the code to work with the amr-ld library
+        IDs are in the format 'articleX.sentY' where X and Y are numbers.
+
+        Returns:
+            str or None: The extracted article namespace or None if no ID field is found.
+        """
+        
+        # Find the line containing the article ID in the AMR
+        
+        id_match = re.search(r'# ::id (\S+?)\.', self.sentences[0][2])
+
+        if id_match:
+            # Extract and return the article namespace
+            article_namespace = id_match.group(1)
+            return article_namespace.strip()
+
+        # Return None if no ID field is found
+        return None
