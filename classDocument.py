@@ -2,9 +2,12 @@ import penman
 import subprocess
 import re
 import rdflib
-from rdflib.namespace import RDF, RDFS
-from pyvis.network import Network
+import spacy
 import networkx as nx
+import Levenshtein
+from rdflib.namespace import RDF, RDFS
+from rdflib import Namespace
+from pyvis.network import Network
 from penman.models.noop import NoOpModel
 from amr_coref.amr_coref.coref.inference import Inference
 
@@ -167,6 +170,7 @@ class Document:
                 self.sentences_rdf.append(rdf_data)
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
+            
             return
 
     def all_sentences_to_rdf(self):
@@ -234,7 +238,8 @@ class Document:
         """
         # Convert all sentences to RDF
         self.all_sentences_to_rdf()
-
+        # Solve coref
+        self.resolve_coreference()
         # Generate document-level RDF graph
         g = self.generate_document_rdf()
 
@@ -267,6 +272,88 @@ class Document:
                     g.add((rdflib.URIRef(variable_node_uri), coreference.sameAs, rdflib.URIRef(relation_node_uri)))
 
         return g
+    
+    ## EVALUATION METHODS
+
+    def extract_kg_entities(self):
+
+        # Create linked graph with coreference resolution
+        kg = self.link_coreference_in_rdf()
+        
+        excluded_labels = {'Cluster rel-', 'AMR-Concept', 'AMR-Role', 'AMR-PropBank-Role', 'AMR-PropBank-Frame', 'AMR-EntityType', 'AMR-Term'}
+
+        # Generate SPARQL query with the FILTER clause to exclude specific labels
+        query_template = """
+        SELECT ?label
+        WHERE {{
+            ?entity rdfs:label ?label .
+            FILTER (!regex(?label, "Cluster rel-") && !(?label IN ({excluded_labels_str})))
+        }}
+        """.format(excluded_labels_str=", ".join('"{}"'.format(label) for label in excluded_labels))
+
+        # Execute the query
+        results = kg.query(query_template, initNs={
+            'amr-core': Namespace("http://amr.isi.edu/rdf/core-amr#"),
+            'amr-terms': Namespace("http://amr.isi.edu/rdf/amr-terms#"),
+            'entity-types': Namespace("http://amr.isi.edu/entity-types#"),
+            'amr-data': Namespace("http://amr.isi.edu/amr_data#"),
+            'propbank': Namespace("http://amr.isi.edu/frames/ld/v1.2.2/"),
+            'coreference' : Namespace("http://example.org/cluster/")
+        })
+
+        # Collect the entities into a set
+        kg_entities = set()
+        for row in results:
+            kg_entities.add(row[0].toPython())
+
+        return kg_entities
+    
+    
+    def compute_metrics(self, verbose = False):
+
+        # Extract entities from the first section using spaCy
+        paragraph_text = self.paragraph
+        nlp = spacy.load("en_core_web_sm")
+        paragraph_doc = nlp(paragraph_text)
+        golden_entities = [ent.text for ent in paragraph_doc.ents]
+        # Filter out number, dates and digits 
+        filtered_g_entities = set([entity for entity in golden_entities if not entity.isdigit()])
+
+        # Extract knowledge graph entities
+        kg_entities = self.extract_kg_entities() 
+
+        # Set up confusion matrix
+        true_positives = len(kg_entities.intersection(filtered_g_entities))
+        false_positives = len(kg_entities.difference(filtered_g_entities))
+        false_negatives = len(set(filtered_g_entities).difference(kg_entities))
+
+        # Calculate precision, recall, and F1-score (& avoid division by 0)
+        precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) != 0 else 0
+        recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) != 0 else 0
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) != 0 else 0
+
+        if verbose:
+
+            print("Golden Entities:", golden_entities)
+            print("Knowledge Graph Entities:", kg_entities)
+            print("Filtered Golden Entities:", filtered_g_entities)            
+            print("Precision:", precision)
+            print("Recall:", recall)
+            print("F1-score:", f1_score)
+
+        return precision, recall, f1_score
+     
+    ## NON functional method, can be reinserted at some point
+    def filter_entities_by_levenshtein(self, entities, reference_labels, threshold):
+        filtered_entities = set()
+        for entity in entities:
+            for label in reference_labels:
+                if Levenshtein.distance(entity, label) <= threshold:
+                    filtered_entities.add(entity)
+                    break  # Move to the next entity once a match is found
+        return filtered_entities
+
+
     
     def generate_clusters_uris(self):
         """
@@ -305,7 +392,7 @@ class Document:
         # Return None if no ID field is found
         return None
 
-### Our of class methods
+### Out of class methods
     
 def visualize_rdf_graph(rdf_graph, filename="RDF_Visualization.html"):
     # Create a NetworkX graph from RDF
